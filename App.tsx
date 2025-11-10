@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useMemo } from 'react';
 import ChatInterface from './components/ChatInterface';
 import Flashcards from './components/Flashcards';
@@ -13,7 +14,7 @@ import { AudioManager } from './utils/audioManager';
 
 type Feature = 'chat' | 'flashcards' | 'multipleChoice' | 'fachgespraech' | 'studyMaterials';
 
-const logoBase64 = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAABDgAAAG+CAYAAABVVl3fAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhcwAADsMAAA7DAcdvqGAAAP+lSURBVHhe7J0FnFRF1sf7l5CAJCRkIYSQhAwhhEAEBEFFVFDEgoCiIBZFRERBQRQVUREEFEFAECggISQhJJCQhExI+v/3zN7d7OzuzO7s7EhyPvd5Pp+cnZmdnZ3Z2Zmd7713Zmd2d0IIoYqjiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqg-n-";
+const logoBase64 = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAABDgAAAG+CAYAAABVVl3fAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhcwAADsMAAA7DAcdvqGAAAP+lSURBVHhe7J0FnFRF1sf7l5CAJCRkIYSQhAwhhEAEBEFFVFDEgoCiIBZFRERBQRQVUREEFEFAECggISQhJJCQhExI+v/3zN7d7OzuzO7s7EhyPvd5Pp+cnZmdnZ3Z2Zmd7713Zmd2d0IIoYqjiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqg-n-";
 
 const App: React.FC = () => {
   const [currentUser, setCurrentUser] = useState<User | null>(() => {
@@ -21,7 +22,6 @@ const App: React.FC = () => {
     try {
       if (savedUser) {
         const parsed = JSON.parse(savedUser);
-        // Basic validation to ensure it's a user object
         if (parsed && typeof parsed.email === 'string' && typeof parsed.credits === 'number') {
           return parsed;
         }
@@ -36,16 +36,30 @@ const App: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   
-  const [studyLibrary, setStudyLibrary] = useState<LibraryCategory[]>(() => {
+  const [userLibrary, setUserLibrary] = useState<LibraryCategory[]>(() => {
     try {
-        const saved = localStorage.getItem('studyLibrary');
+        const saved = localStorage.getItem('userStudyLibrary');
         if (saved) {
             const parsed = JSON.parse(saved);
-            if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+            if (Array.isArray(parsed)) return parsed;
         }
-    } catch (error) { console.error("Could not parse library from localStorage", error); }
-    return parsedLibraryData;
+    } catch (error) { console.error("Could not parse user library from localStorage", error); }
+    return [];
   });
+
+  const studyLibrary = useMemo(() => {
+      const merged: LibraryCategory[] = JSON.parse(JSON.stringify(parsedLibraryData)); // Deep copy base library
+      userLibrary.forEach(userCategory => {
+          const existingCategory = merged.find(c => c.title === userCategory.title);
+          if (existingCategory) {
+              existingCategory.entries.push(...userCategory.entries);
+          } else {
+              merged.push(userCategory);
+          }
+      });
+      return merged;
+  }, [userLibrary]);
+
 
   const [fachgespraechTopics, setFachgespraechTopics] = useState<FachgespraechTopic[]>(() => {
     const saved = localStorage.getItem('fachgespraechTopics');
@@ -76,8 +90,8 @@ const App: React.FC = () => {
   }, [currentUser]);
 
   useEffect(() => {
-    localStorage.setItem('studyLibrary', JSON.stringify(studyLibrary));
-  }, [studyLibrary]);
+    localStorage.setItem('userStudyLibrary', JSON.stringify(userLibrary));
+  }, [userLibrary]);
 
   useEffect(() => {
     localStorage.setItem('fachgespraechTopics', JSON.stringify(fachgespraechTopics));
@@ -118,19 +132,21 @@ const App: React.FC = () => {
   };
 
   const handleAddLibraryEntry = (newEntry: Omit<LibraryEntry, 'id'>, categoryTitle: string) => {
-    setStudyLibrary(prevLibrary => {
-        const newLibrary = [...prevLibrary];
-        const categoryIndex = newLibrary.findIndex(cat => cat.title === categoryTitle);
-        if (categoryIndex > -1) {
-            const newId = `entry-${Date.now()}`;
-            newLibrary[categoryIndex].entries.push({ ...newEntry, id: newId });
+    setUserLibrary(prevLibrary => {
+        const newLibrary = JSON.parse(JSON.stringify(prevLibrary)); // Deep copy
+        let category = newLibrary.find((cat: LibraryCategory) => cat.title === categoryTitle);
+        if (!category) {
+            category = { title: categoryTitle, entries: [] };
+            newLibrary.push(category);
         }
+        const newId = `user-${Date.now()}`;
+        category.entries.push({ ...newEntry, id: newId });
         return newLibrary;
     });
   };
 
   const handleUpdateLibraryEntry = (updatedEntry: LibraryEntry, categoryTitle: string) => {
-      setStudyLibrary(prevLibrary => prevLibrary.map(category => {
+      setUserLibrary(prevLibrary => prevLibrary.map(category => {
           if (category.title === categoryTitle) {
               return {
                   ...category,
@@ -144,7 +160,7 @@ const App: React.FC = () => {
   };
 
   const handleDeleteLibraryEntry = (entryId: string, categoryTitle: string) => {
-      setStudyLibrary(prevLibrary => prevLibrary.map(category => {
+      setUserLibrary(prevLibrary => prevLibrary.map(category => {
           if (category.title === categoryTitle) {
               return {
                   ...category,
@@ -152,8 +168,37 @@ const App: React.FC = () => {
               };
           }
           return category;
-      }));
+      }).filter(category => category.entries.length > 0)); // Remove empty categories
   };
+
+  const handleBulkAddLibraryEntries = (newEntries: { question: string; answer: string; categoryTitle: string }[]) => {
+    setUserLibrary(prevLibrary => {
+        const newLibrary: LibraryCategory[] = JSON.parse(JSON.stringify(prevLibrary));
+        newEntries.forEach(newEntryData => {
+            let category = newLibrary.find(cat => cat.title === newEntryData.categoryTitle);
+            if (!category) {
+                // Also check base library categories
+                const baseCategoryExists = parsedLibraryData.some(cat => cat.title === newEntryData.categoryTitle);
+                if (baseCategoryExists) {
+                    category = { title: newEntryData.categoryTitle, entries: [] };
+                    newLibrary.push(category);
+                } else {
+                    // If category doesn't exist anywhere, create it in the user library
+                    category = { title: newEntryData.categoryTitle, entries: [] };
+                    newLibrary.push(category);
+                }
+            }
+             const newId = `user-${Date.now()}-${Math.random()}`;
+             category.entries.push({
+                id: newId,
+                question: newEntryData.question,
+                answer: newEntryData.answer
+             });
+        });
+        return newLibrary;
+    });
+};
+
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -182,7 +227,8 @@ const App: React.FC = () => {
       case 'chat':
         return <ChatInterface {...props} />;
       case 'flashcards':
-        return <Flashcards studyLibrary={studyLibrary} {...props} />;
+        // FIX: Pass the 'studyLibrary' prop to the Flashcards component.
+        return <Flashcards {...props} studyLibrary={studyLibrary} />;
       case 'multipleChoice':
         return <MultipleChoice {...props} />;
       case 'fachgespraech':
@@ -193,9 +239,11 @@ const App: React.FC = () => {
                     onAddEntry={handleAddLibraryEntry}
                     onUpdateEntry={handleUpdateLibraryEntry}
                     onDeleteEntry={handleDeleteLibraryEntry}
+                    onBulkAdd={handleBulkAddLibraryEntries}
                 />;
       default:
-        return <Flashcards studyLibrary={studyLibrary} {...props} />;
+        // FIX: Pass the 'studyLibrary' prop to the Flashcards component.
+        return <Flashcards {...props} studyLibrary={studyLibrary} />;
     }
   };
 

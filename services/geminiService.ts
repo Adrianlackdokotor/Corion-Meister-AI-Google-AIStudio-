@@ -1,5 +1,5 @@
 import { GoogleGenAI, Chat, GenerateContentResponse, Modality, Type, LiveSession, LiveServerMessage, CloseEvent, ErrorEvent, FunctionDeclaration } from '@google/genai';
-import { FlashcardEvaluation, MultipleChoiceQuestion, Flashcard, Language } from '../types';
+import { FlashcardEvaluation, MultipleChoiceQuestion, Flashcard, Language, LibraryCategory, LibraryEntry } from '../types';
 
 if (!process.env.API_KEY) {
   console.warn("API_KEY environment variable not set. VEO features may require user selection.");
@@ -299,32 +299,31 @@ export const generateMultipleChoiceQuiz = async (
   }
 };
 
-// --- Flashcard Generation from Text ---
+// --- Flashcard Generation from Text (for Flashcards component) ---
 export const generateFlashcardsFromText = async (
   studyMaterials: string,
-  categories: { id: string; name: string; description: string }[]
+  categories: { id: string; name: string }[]
 ): Promise<Pick<Flashcard, 'front' | 'back' | 'categoryId'>[]> => {
   const ai = getAIClient();
   const categoryEnum = categories.map(c => c.id);
-  const formattedCategories = JSON.stringify(categories.map(c => ({ id: c.id, name: c.name, description: c.description })), null, 2);
+  const formattedCategories = JSON.stringify(categories, null, 2);
 
   const prompt = `
-    Du bist ein Experte für Lackiertechnik und erstellst Lernkarten für einen Meisterschüler.
-    Basierend auf dem folgenden Lernmaterial, erstelle so viele relevante Lernkarten wie möglich.
-    Jede Lernkarte muss eine klare Frage ('front') und eine prägnante, korrekte Antwort ('back') haben.
-    Ordne JEDE Lernkarte der am besten passenden Kategorie aus der folgenden Liste zu, indem du die korrekte 'categoryId' verwendest.
+    Du bist ein Experte für Lackiertechnik und erstellst Lernkarten.
+    Basierend auf dem folgenden Text, erstelle relevante Lernkarten (Frage/Antwort).
+    Ordne JEDE Lernkarte der am besten passenden Kategorie-ID aus der Liste zu.
 
-    Lernmaterial:
+    Text:
     ---
     ${studyMaterials}
     ---
 
-    Verfügbare Kategorien:
+    Kategorien:
     ---
     ${formattedCategories}
     ---
 
-    Deine Antwort muss ein valides JSON-Array sein, das dem folgenden Schema entspricht.
+    Deine Antwort muss ein valides JSON-Array sein.
   `;
 
   try {
@@ -338,13 +337,9 @@ export const generateFlashcardsFromText = async (
           items: {
             type: Type.OBJECT,
             properties: {
-              front: { type: Type.STRING, description: "Die Frage auf der Vorderseite der Karte." },
-              back: { type: Type.STRING, description: "Die Antwort auf der Rückseite der Karte." },
-              categoryId: {
-                type: Type.STRING,
-                enum: categoryEnum,
-                description: "Die ID der am besten passenden Kategorie."
-              }
+              front: { type: Type.STRING },
+              back: { type: Type.STRING },
+              categoryId: { type: Type.STRING, enum: categoryEnum }
             },
             required: ['front', 'back', 'categoryId'],
           }
@@ -353,14 +348,69 @@ export const generateFlashcardsFromText = async (
     });
 
     const jsonString = response.text.trim();
+    return JSON.parse(jsonString);
+  } catch (error) {
+    console.error("Failed to generate flashcards from text:", error);
+    throw new Error('Fehler bei der AI-Generierung von Lernkarten.');
+  }
+};
+
+
+// --- Library Entry Generation from Text (for StudyMaterials component) ---
+export const generateLibraryEntriesFromText = async (
+  extractedText: string,
+  existingCategories: LibraryCategory[]
+): Promise<{ question: string; answer: string; categoryTitle: string }[]> => {
+  const ai = getAIClient();
+  const categoryTitles = existingCategories.map(c => c.title);
+
+  const prompt = `
+    Du bist ein Experte für Lackiertechnik und deine Aufgabe ist es, aus einem Text sinnvolle Frage-Antwort-Paare für eine Lernbibliothek zu erstellen.
+    Analysiere den folgenden Text und erstelle eine Liste von strukturierten Frage-Antwort-Paaren.
+    Ordne jedes Paar einer passenden Kategorie zu. Du kannst eine der existierenden Kategorien verwenden oder, falls keine passt, einen neuen, prägnanten Kategorietitel vorschlagen.
+
+    Text zum Analysieren:
+    ---
+    ${extractedText}
+    ---
+
+    Existierende Kategorien:
+    ---
+    ${categoryTitles.join(', ')}
+    ---
+
+    Deine Antwort muss ein valides JSON-Array sein, bei dem jedes Objekt eine 'question', eine 'answer' und einen 'categoryTitle' enthält.
+  `;
+
+  try {
+    const response = await ai.models.generateContent({
+      model: 'gemini-2.5-flash',
+      contents: prompt,
+      config: {
+        responseMimeType: 'application/json',
+        responseSchema: {
+          type: Type.ARRAY,
+          items: {
+            type: Type.OBJECT,
+            properties: {
+              question: { type: Type.STRING, description: "Die generierte Frage." },
+              answer: { type: Type.STRING, description: "Die generierte Antwort." },
+              categoryTitle: { type: Type.STRING, description: "Der Titel der passendsten Kategorie (existierend oder neu)." }
+            },
+            required: ['question', 'answer', 'categoryTitle'],
+          }
+        },
+      },
+    });
+
+    const jsonString = response.text.trim();
     const parsedJson = JSON.parse(jsonString);
     if (Array.isArray(parsedJson)) {
-      // Filter out any potential malformed entries
-      return parsedJson.filter(item => item.front && item.back && item.categoryId) as Pick<Flashcard, 'front' | 'back' | 'categoryId'>[];
+      return parsedJson;
     }
-    throw new Error('Invalid JSON structure from API or empty array');
+    throw new Error('Invalid JSON structure from API');
   } catch (error) {
-    console.error("Failed to generate flashcards:", error);
-    throw new Error('Bei der Erstellung der Lernkarten ist ein Fehler aufgetreten. Bitte versuche es erneut.');
+    console.error("Failed to generate library entries:", error);
+    throw new Error('Fehler bei der AI-Generierung von Bibliothekeinträgen.');
   }
 };
