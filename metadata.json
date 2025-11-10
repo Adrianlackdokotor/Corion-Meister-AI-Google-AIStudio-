@@ -1,0 +1,7 @@
+{
+  "name": "Corion AI Learning Suite",
+  "description": "An advanced, multimodal AI-powered suite for professional training, featuring interactive chat, image and video generation, real-time conversation, and more, all guided by an expert AI tutor persona.",
+  "requestFramePermissions": [
+    "microphone"
+  ]
+}
