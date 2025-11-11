@@ -12,7 +12,11 @@ interface FachgespraechProps {
   topics: FachgespraechTopic[];
   onUpdateTopics: React.Dispatch<React.SetStateAction<FachgespraechTopic[]>>;
   currentUser: User;
+  consumeCredits: (amount: number, description: string) => boolean;
+  onExamComplete: () => void;
 }
+
+const SIMULATION_COST = 200;
 
 const AddNewTopicModal: React.FC<{
     isOpen: boolean;
@@ -109,7 +113,7 @@ const AddNewTopicModal: React.FC<{
 };
 
 
-const Fachgespraech: React.FC<FachgespraechProps> = ({ studyMaterials, topics, onUpdateTopics, currentUser }) => {
+const Fachgespraech: React.FC<FachgespraechProps> = ({ studyMaterials, topics, onUpdateTopics, currentUser, consumeCredits, onExamComplete }) => {
     const [mode, setMode] = useState<'practice' | 'exam'>('practice');
     const [conversationState, setConversationState] = useState<'setup' | 'running' | 'finished'>('setup');
     const [selectedTopicId, setSelectedTopicId] = useState<string>('general');
@@ -176,6 +180,14 @@ ${examTopic}
     }, [mode, studyMaterials, topics, selectedTopicId]);
 
     const handleStartConversation = async () => {
+        const selectedTopic = topics.find(t => t.id === selectedTopicId);
+        const topicTitle = selectedTopic ? selectedTopic.title : 'Allgemeines Wissen';
+
+        if (!consumeCredits(SIMULATION_COST, `Fachgespräch-Simulation: ${topicTitle}`)) {
+            alert("Guthaben nicht ausreichend für die Simulation.");
+            return;
+        }
+
         setIsLoading(true);
         setConversationState('running');
         const systemInstruction = getSystemPrompt();
@@ -251,7 +263,7 @@ ${examTopic}
         }
     };
     
-    useEffect(() => { if (!isRecording && userInput.trim()) { handleSendMessage(); } }, [isRecording]);
+    useEffect(() => { if (!isRecording && userInput.trim()) { handleSendMessage(); } }, [isRecording, userInput]);
 
     const handleSendMessage = async () => {
         if (!userInput.trim() || !chat) return;
@@ -272,7 +284,11 @@ ${examTopic}
                     return newMessages;
                 });
             }
-             if (mode === 'exam' && text.includes("Die Prüfung ist beendet.")) { setConversationState('finished'); }
+             // FIX: Add logic to call onExamComplete when the exam is finished.
+             if (mode === 'exam' && text.includes("Die Prüfung ist beendet.")) {
+                 setConversationState('finished');
+                 onExamComplete();
+             }
         } catch (error) {
             console.error("Error sending message:", error);
             setMessages(prev => {
@@ -307,6 +323,7 @@ ${examTopic}
     };
     
     const currentTopicContent = selectedTopicId === 'general' ? studyMaterials : topics.find(t => t.id === selectedTopicId)?.content || '';
+    const hasCredits = currentUser.credits >= SIMULATION_COST;
 
     const renderSetup = () => (
         <div className="flex-1 flex flex-col justify-center items-center p-6">
@@ -352,12 +369,12 @@ ${examTopic}
                     </div>
                     <button 
                         onClick={handleStartConversation} 
-                        disabled={!currentTopicContent.trim() || currentUser.credits <= 0} 
+                        disabled={!currentTopicContent.trim() || !hasCredits} 
                         className="w-full py-3 px-4 bg-red-600 text-white font-semibold rounded-lg hover:bg-red-700 disabled:bg-gray-500 transition-colors text-lg"
                     >
-                        Simulation starten
+                        {`Simulation starten (-${SIMULATION_COST} Hub+1)`}
                     </button>
-                    {currentUser.credits <= 0 && <p className="text-yellow-400 mt-4 text-center">Sie haben kein Guthaben mehr, um eine Simulation zu starten.</p>}
+                    {!hasCredits && <p className="text-yellow-400 mt-4 text-center">Sie haben kein Guthaben mehr, um eine Simulation zu starten.</p>}
                 </div>
             </div>
             <AddNewTopicModal isOpen={isTopicModalOpen} onClose={() => setIsTopicModalOpen(false)} onSave={handleSaveNewTopic} />

@@ -415,6 +415,52 @@ export const generateLibraryEntriesFromText = async (
   }
 };
 
+// --- MATE Formeln Flashcard Generation ---
+export const generateFormelFlashcardsFromText = async (
+  extractedText: string
+): Promise<Pick<FormelFlashcard, 'front' | 'back'>[]> => {
+  const ai = getAIClient();
+  const prompt = `
+    Du bist ein Experte für Lackiertechnik und Betriebswirtschaft. Deine Aufgabe ist es, aus einem Text relevante Formeln und deren Erklärungen zu extrahieren und sie in Lernkarten umzuwandeln.
+    Analysiere den folgenden Text und erstelle eine Liste von Lernkarten. Jede Lernkarte sollte einen Namen/eine Frage auf der Vorderseite ('front') und die Formel/Erklärung auf der Rückseite ('back') haben.
+
+    **Text zum Analysieren:**
+    ---
+    ${extractedText}
+    ---
+
+    **Deine Antwort muss ein valides JSON-Array sein, bei dem jedes Objekt einen 'front'- und einen 'back'-Schlüssel enthält.**
+    - 'front': Der Name der Formel oder eine Frage dazu.
+    - 'back': Die Formel selbst, ein Rechenbeispiel oder eine kurze Erklärung.
+  `;
+
+  try {
+    const response = await ai.models.generateContent({
+      model: 'gemini-2.5-flash',
+      contents: prompt,
+      config: {
+        responseMimeType: 'application/json',
+        responseSchema: {
+          type: Type.ARRAY,
+          items: {
+            type: Type.OBJECT,
+            properties: {
+              front: { type: Type.STRING, description: "Der Name der Formel oder eine Frage dazu." },
+              back: { type: Type.STRING, description: "Die Formel selbst, ein Rechenbeispiel oder eine kurze Erklärung." }
+            },
+            required: ['front', 'back'],
+          }
+        },
+      },
+    });
+    const jsonString = response.text.trim();
+    return JSON.parse(jsonString);
+  } catch (error) {
+    console.error("Failed to generate formula flashcards:", error);
+    throw new Error('Fehler bei der AI-Generierung von Formel-Lernkarten.');
+  }
+};
+
 // --- MATE Kalkulation Explanation ---
 export const explainTextSelection = async (
   selectedText: string,
@@ -494,50 +540,4 @@ export const generateMateMaterialFromText = async (
         console.error("Failed to generate MATE material:", error);
         throw new Error('Fehler bei der AI-Generierung von Kalkulationsmaterial.');
     }
-};
-
-// --- Formula Flashcard Generation ---
-export const generateFormelFlashcardsFromText = async (
-  extractedText: string
-): Promise<Omit<FormelFlashcard, 'id'>[]> => {
-  const ai = getAIClient();
-  const prompt = `
-    Du bist ein Experte für Lackiertechnik und Betriebswirtschaft. Deine Aufgabe ist es, aus einem Text Formeln zu extrahieren und sie als Lernkarten aufzubereiten.
-    Analysiere den folgenden Text und erstelle eine Liste von Lernkarten.
-
-    **Text zum Analysieren:**
-    ---
-    ${extractedText}
-    ---
-
-    **Deine Antwort muss ein valides JSON-Array sein.** Jedes Objekt im Array muss die folgenden Schlüssel enthalten:
-    - 'front': Der Name der Formel (z.B., "Werkstoffverbrauch").
-    - 'back': Eine Zeichenkette, die die mathematische Formel und ein konkretes Rechenbeispiel enthält. Formatiere dies klar und lesbar, z.B., "Formel: ...\\n\\nRechenbeispiel: ...".
-  `;
-
-  try {
-    const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash',
-      contents: prompt,
-      config: {
-        responseMimeType: 'application/json',
-        responseSchema: {
-          type: Type.ARRAY,
-          items: {
-            type: Type.OBJECT,
-            properties: {
-              front: { type: Type.STRING, description: "Der Name der Formel." },
-              back: { type: Type.STRING, description: "Die Formel und ein Rechenbeispiel, klar formatiert." }
-            },
-            required: ['front', 'back'],
-          }
-        },
-      },
-    });
-    const jsonString = response.text.trim();
-    return JSON.parse(jsonString);
-  } catch (error) {
-    console.error("Failed to generate formula flashcards:", error);
-    throw new Error('Fehler bei der AI-Generierung von Formel-Lernkarten.');
-  }
 };

@@ -8,9 +8,13 @@ interface MultipleChoiceProps {
   studyMaterials: string;
   language: Language;
   currentUser: User;
+  consumeCredits: (amount: number, description: string) => boolean;
+  onQuizComplete: () => void;
 }
 
-const MultipleChoice: React.FC<MultipleChoiceProps> = ({ studyMaterials, language, currentUser }) => {
+const QUIZ_GENERATION_COST = 100;
+
+const MultipleChoice: React.FC<MultipleChoiceProps> = ({ studyMaterials, language, currentUser, consumeCredits, onQuizComplete }) => {
     const [quiz, setQuiz] = useState<MultipleChoiceQuestion[] | null>(null);
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
     const [selectedAnswerId, setSelectedAnswerId] = useState<string | null>(null);
@@ -18,19 +22,23 @@ const MultipleChoice: React.FC<MultipleChoiceProps> = ({ studyMaterials, languag
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [askedQuestions, setAskedQuestions] = useState<string[]>([]);
+    const [quizCompleted, setQuizCompleted] = useState(false);
 
     const handleGenerateQuiz = async () => {
         if (!studyMaterials.trim()) {
             setError('Die Lernmaterialien sind leer. Inhalte können in der "Lernbibliothek" eingesehen werden.');
             return;
         }
-        if (currentUser.credits <= 0) {
+        
+        if (!consumeCredits(QUIZ_GENERATION_COST, 'Multiple-Choice-Quiz erstellt')) {
             setError('Ihr Guthaben reicht nicht aus, um ein Quiz zu erstellen.');
             return;
         }
+
         setIsLoading(true);
         setError(null);
         setQuiz(null);
+        setQuizCompleted(false);
         try {
             const generatedQuiz = await generateMultipleChoiceQuiz(studyMaterials, language, 15, askedQuestions);
             if (generatedQuiz.length === 0) {
@@ -60,6 +68,11 @@ const MultipleChoice: React.FC<MultipleChoiceProps> = ({ studyMaterials, languag
     };
     
     const handleNextQuestion = () => {
+        // FIX: Add logic to call onQuizComplete when the quiz is finished.
+        if (quiz && !quizCompleted && currentQuestionIndex === quiz.length - 1) {
+            onQuizComplete();
+            setQuizCompleted(true);
+        }
         setSelectedAnswerId(null);
         setCurrentQuestionIndex(prev => prev + 1);
     };
@@ -147,6 +160,8 @@ const MultipleChoice: React.FC<MultipleChoiceProps> = ({ studyMaterials, languag
         );
     };
 
+    const hasCredits = currentUser.credits >= QUIZ_GENERATION_COST;
+
     return (
         <div className="flex flex-col h-full bg-gray-900 p-6">
             <div className="flex-shrink-0 flex justify-between items-center">
@@ -170,13 +185,13 @@ const MultipleChoice: React.FC<MultipleChoiceProps> = ({ studyMaterials, languag
                             <p className="mb-4 text-gray-300">Bereit, Ihr Wissen zu testen? Klicken Sie, um ein Quiz mit 15 Fragen basierend auf Ihren Lernmaterialien zu erstellen.</p>
                             <button
                                 onClick={handleGenerateQuiz}
-                                disabled={isLoading || currentUser.credits <= 0}
+                                disabled={isLoading || !hasCredits}
                                 className="w-full max-w-xs mx-auto py-3 px-4 bg-red-600 text-white font-semibold rounded-lg hover:bg-red-700 disabled:bg-gray-500 transition-colors flex items-center justify-center text-lg"
                             >
                                 <Icon name="list" className="h-6 w-6 mr-2"/>
-                                {isLoading ? 'Quiz wird erstellt...' : 'Quiz erstellen'}
+                                {isLoading ? 'Quiz wird erstellt...' : `Quiz erstellen (-${QUIZ_GENERATION_COST} Hub+1)`}
                             </button>
-                            {currentUser.credits <= 0 && <p className="text-yellow-400 mt-4">Sie haben kein Guthaben mehr, um ein Quiz zu erstellen.</p>}
+                            {!hasCredits && <p className="text-yellow-400 mt-4">Sie haben kein Guthaben mehr, um ein Quiz zu erstellen.</p>}
                          </>
                        ) : (
                          <div className="p-6 bg-gray-800 border-2 border-dashed border-gray-600 rounded-lg">

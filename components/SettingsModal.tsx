@@ -1,75 +1,41 @@
+
 import React, { useState } from 'react';
 import { Icon } from './Icon';
 import { Language, User } from '../types';
-import { AudioManager } from '../utils/audioManager';
 
 interface SettingsModalProps {
   isOpen: boolean;
   onClose: () => void;
-  volume: number;
-  setVolume: (volume: number) => void;
-  isMuted: boolean;
-  setIsMuted: (isMuted: boolean) => void;
   language: Language;
   setLanguage: (language: Language) => void;
-  audioManager: AudioManager;
   currentUser: User | null;
+  onAddCredits: (amount: number, description: string) => void;
+  onOpenAchievements: () => void;
 }
 
 type SettingsTab = 'general' | 'billing';
 
+const creditPackages = [
+    { name: 'Starter Paket', credits: 10000, price: '5,00 €' },
+    { name: 'Profi Paket', credits: 50000, price: '20,00 €' },
+    { name: 'Meister Paket', credits: 150000, price: '50,00 €' },
+];
+
 const SettingsModal: React.FC<SettingsModalProps> = ({
   isOpen,
   onClose,
-  volume,
-  setVolume,
-  isMuted,
-  setIsMuted,
   language,
   setLanguage,
-  audioManager,
-  currentUser
+  currentUser,
+  onAddCredits,
+  onOpenAchievements
 }) => {
   const [activeTab, setActiveTab] = useState<SettingsTab>('general');
   
   if (!isOpen) return null;
 
-  const handleVolumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newVolume = parseFloat(e.target.value);
-    setVolume(newVolume);
-    if(isMuted) setIsMuted(false);
-  };
-  
-  const handleToggleMute = () => {
-      setIsMuted(!isMuted);
-      audioManager.play('click');
-  }
-
   const GeneralSettings = () => (
     <div className="space-y-6">
-        {/* Audio Settings */}
-        <div className="space-y-2">
-            <label className="block text-sm font-medium text-gray-300">Audio-Steuerung</label>
-            <div className="flex items-center gap-4 bg-gray-700 p-3 rounded-lg">
-                <button onClick={handleToggleMute} className="p-2 text-gray-300 hover:text-white">
-                    <Icon name={isMuted || volume === 0 ? 'volume-off' : 'volume-up'} className="h-6 w-6" />
-                </button>
-                <input 
-                    type="range"
-                    min="0"
-                    max="1"
-                    step="0.01"
-                    value={isMuted ? 0 : volume}
-                    onChange={handleVolumeChange}
-                    className="w-full h-2 bg-gray-600 rounded-lg appearance-none cursor-pointer"
-                    style={{
-                        background: `linear-gradient(to right, #EF4444 ${volume * 100}%, #4B5563 ${volume * 100}%)`
-                    }}
-                />
-            </div>
-        </div>
-        
-        {/* Language Settings */}
         <div className="space-y-2">
             <label htmlFor="language-select" className="block text-sm font-medium text-gray-300">
                 Sprache für AI-Erklärungen
@@ -87,22 +53,80 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
                 <option value="Polish">Polski</option>
             </select>
         </div>
+        <div>
+            <h4 className="font-semibold text-gray-200 mb-2">Erfolge</h4>
+            <button 
+                onClick={() => {
+                    onClose(); // Close settings to show achievements
+                    onOpenAchievements();
+                }}
+                className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-gray-700 text-white font-semibold rounded-lg hover:bg-gray-600 transition-colors"
+            >
+                <Icon name="trophy" className="h-5 w-5"/>
+                <span>Meine Erfolge anzeigen</span>
+            </button>
+        </div>
     </div>
   );
 
   const BillingSettings = () => (
-    <div className="space-y-4">
+    <div className="space-y-6">
         <div>
             <p className="text-sm text-gray-400">Ihr aktuelles Guthaben:</p>
-            <p className="text-3xl font-bold text-yellow-400">{currentUser?.credits.toLocaleString('de-DE')} Hub+1-Credits</p>
+            <p className="text-3xl font-bold text-yellow-400">{currentUser?.credits.toLocaleString('de-DE')} Hub+1</p>
         </div>
-        <div className="p-4 bg-gray-700/50 rounded-lg text-sm text-gray-300">
-            <p className="mb-2">Jeder neue Benutzer erhält ein kostenloses Startguthaben im Wert von 2 €. Dies ermöglicht die volle Nutzung aller AI-Funktionen.</p>
-            <p>Sobald Ihr Guthaben aufgebraucht ist, werden AI-gestützte Funktionen (wie Quiz-Erstellung, Antwortbewertung usw.) gesperrt, bis Sie Ihr Guthaben aufladen. Funktionen, die keine AI verwenden, bleiben kostenlos.</p>
+        
+        <div>
+            <h4 className="font-semibold text-gray-200 mb-2">Guthaben aufladen</h4>
+            <div className="space-y-2">
+                {creditPackages.map(pkg => (
+                    <div key={pkg.name} className="flex justify-between items-center p-3 bg-gray-700/50 rounded-lg">
+                        <div>
+                            <p className="font-semibold">{pkg.name}</p>
+                            <p className="text-sm text-yellow-400">{pkg.credits.toLocaleString('de-DE')} Hub+1</p>
+                        </div>
+                        <button 
+                            onClick={() => onAddCredits(pkg.credits, `Kauf: ${pkg.name}`)}
+                            className="px-4 py-1.5 bg-red-600 text-white font-semibold rounded-lg hover:bg-red-700 text-sm"
+                        >
+                            {pkg.price} Kaufen
+                        </button>
+                    </div>
+                ))}
+            </div>
+            <p className="text-xs text-gray-500 mt-2">Die Bezahlung wird sicher über Stripe abgewickelt (simuliert).</p>
         </div>
-        <button className="w-full py-2 px-4 bg-red-600 text-white font-semibold rounded-lg hover:bg-red-700">
-            Guthaben aufladen (Stripe Integration)
-        </button>
+
+        <div>
+            <h4 className="font-semibold text-gray-200 mb-2">Transaktionsverlauf</h4>
+            <div className="max-h-48 overflow-y-auto bg-gray-900/50 p-2 rounded-md border border-gray-600">
+                {currentUser?.transactions && currentUser.transactions.length > 0 ? (
+                    <table className="w-full text-sm text-left">
+                        <thead className="text-xs text-gray-400 uppercase">
+                            <tr>
+                                <th className="px-2 py-1">Beschreibung</th>
+                                <th className="px-2 py-1 text-right">Betrag</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        {currentUser.transactions.map(t => (
+                            <tr key={t.id} className="border-b border-gray-700 last:border-b-0">
+                                <td className="px-2 py-2">
+                                    <p className="font-medium text-gray-200">{t.description}</p>
+                                    <p className="text-xs text-gray-500">{new Date(t.date).toLocaleString('de-DE')}</p>
+                                </td>
+                                <td className={`px-2 py-2 text-right font-semibold ${t.amount < 0 ? 'text-red-400' : 'text-green-400'}`}>
+                                    {t.amount.toLocaleString('de-DE')}
+                                </td>
+                            </tr>
+                        ))}
+                        </tbody>
+                    </table>
+                ) : (
+                    <p className="text-center text-gray-500 p-4">Keine Transaktionen vorhanden.</p>
+                )}
+            </div>
+        </div>
     </div>
   );
 
@@ -112,7 +136,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
       onClick={onClose}
     >
       <div 
-        className="bg-gray-800 rounded-lg w-full max-w-md shadow-xl border border-gray-700 flex flex-col"
+        className="bg-gray-800 rounded-lg w-full max-w-lg shadow-xl border border-gray-700 flex flex-col"
         onClick={e => e.stopPropagation()}
       >
         <div className="flex justify-between items-center p-6 border-b border-gray-700">

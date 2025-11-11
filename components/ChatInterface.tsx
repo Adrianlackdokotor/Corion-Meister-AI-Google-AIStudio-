@@ -1,13 +1,14 @@
-
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { Chat } from '@google/genai';
-import { ChatMessage } from '../types';
+import { ChatMessage, User } from '../types';
 import { createChatSession, streamChatMessage } from '../services/geminiService';
 import { Icon } from './Icon';
 import Loader from './Loader';
 
 interface ChatInterfaceProps {
   studyMaterials: string;
+  currentUser: User;
+  consumeCredits: (amount: number, description: string) => boolean;
 }
 
 const getPersonaPrompt = (materials: string) => `
@@ -27,7 +28,9 @@ ${materials.trim() || "Es wurden noch keine Lernmaterialien bereitgestellt. Die 
 ---
 `;
 
-const ChatInterface: React.FC<ChatInterfaceProps> = ({ studyMaterials }) => {
+const CHAT_MESSAGE_COST = 1;
+
+const ChatInterface: React.FC<ChatInterfaceProps> = ({ studyMaterials, currentUser, consumeCredits }) => {
     const [messages, setMessages] = useState<ChatMessage[]>([]);
     const [userInput, setUserInput] = useState('');
     const [isLoading, setIsLoading] = useState(false);
@@ -101,6 +104,11 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ studyMaterials }) => {
         e?.preventDefault();
         if (!userInput.trim() || !chat) return;
 
+        if (!consumeCredits(CHAT_MESSAGE_COST, 'Chat-Nachricht')) {
+            alert("Guthaben nicht ausreichend.");
+            return;
+        }
+
         const newUserMessage: ChatMessage = { role: 'user', text: userInput };
         setMessages(prev => [...prev, newUserMessage]);
         setUserInput('');
@@ -132,6 +140,8 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ studyMaterials }) => {
         }
     };
     
+    const hasCredits = currentUser.credits > 0;
+
     return (
         <div className="flex flex-col h-full bg-gray-900">
             <div className="p-4 border-b border-gray-700">
@@ -171,7 +181,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ studyMaterials }) => {
                         <textarea
                             value={userInput}
                             onChange={(e) => setUserInput(e.target.value)}
-                            placeholder={isRecording ? "Höre zu..." : "Schreiben Sie Ihre Nachricht oder einen Befehl..."}
+                            placeholder={!hasCredits ? "Guthaben aufgebraucht." : (isRecording ? "Höre zu..." : "Schreiben Sie Ihre Nachricht...")}
                             rows={1}
                             className="flex-1 p-2 bg-gray-800 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 text-gray-200 resize-none"
                             onKeyDown={(e) => {
@@ -179,17 +189,17 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ studyMaterials }) => {
                                     handleSendMessage(e);
                                 }
                             }}
-                            disabled={!studyMaterials.trim()}
+                            disabled={!studyMaterials.trim() || !hasCredits}
                         />
                         <button
                             type="button"
                             onClick={toggleRecording}
                             className={`p-2 rounded-full transition-colors ${isRecording ? 'bg-red-700 text-white animate-pulse' : 'bg-gray-600 hover:bg-gray-500'}`}
-                             disabled={!studyMaterials.trim()}
+                             disabled={!studyMaterials.trim() || !hasCredits}
                         >
                             <Icon name="mic" className="h-6 w-6" />
                         </button>
-                        <button type="submit" disabled={isLoading || !userInput.trim()} className="p-3 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:bg-gray-500">
+                        <button type="submit" disabled={isLoading || !userInput.trim() || !hasCredits} className="p-3 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:bg-gray-500">
                             <Icon name="send" className="h-6 w-6" />
                         </button>
                     </form>

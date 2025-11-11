@@ -1,3 +1,4 @@
+
 export interface ChatMessage {
   role: 'user' | 'model';
   text: string;
@@ -7,10 +8,18 @@ export interface Flashcard {
   id: string;
   categoryId: string;
   front: string;
+
   back: string;
   masteryLevel: number; // NS 0-5
   backgroundImageUrl?: string;
   imageUrl?: string; 
+}
+
+export interface FormelFlashcard {
+  id: string;
+  front: string;
+  back: string;
+  isUserCreated?: boolean;
 }
 
 export interface FlashcardEvaluation {
@@ -59,26 +68,51 @@ export interface FachgespraechTopic {
 
 export type Language = 'German' | 'Romanian' | 'English' | 'Polish';
 
+export interface Transaction {
+  id: string;
+  date: string;
+  description: string;
+  amount: number; // Negative for consumption, positive for addition
+}
+
+export type AchievementId = 'MASTERY_1' | 'MASTERY_20' | 'QUIZ_1' | 'QUIZ_5' | 'EXAM_1' | 'STREAK_7' | 'STREAK_30' | 'ARCHITECT_1' | 'ARCHITECT_10';
+
+export interface Achievement {
+    id: AchievementId;
+    name: string;
+    description: string;
+    icon: string;
+    criteria: {
+        type: 'masteredCards' | 'quizzesCompleted' | 'examsCompleted' | 'streak' | 'userContentAdded';
+        value: number;
+    };
+}
+
+export interface UserAchievement {
+    achievementId: AchievementId;
+    unlockedAt: string;
+}
+
 export interface User {
   email: string;
   credits: number;
   tier: 'admin' | 'user';
+  transactions: Transaction[];
+  lastSessionCreditUsage: number;
+  // Gamification fields
+  lastLoginDate: string; // ISO date string 'YYYY-MM-DD'
+  dailyStreak: number;
+  achievements: UserAchievement[];
 }
+
 
 export interface MateMaterial {
   id: string;
   title: string;
   content: string; // Markdown content
   isUserCreated?: boolean;
+  notes?: string[];
 }
-
-export interface FormelFlashcard {
-  id: string;
-  front: string; // Name der Formel
-  back: string;  // Formel + Rechenbeispiel
-  isUserCreated?: boolean;
-}
-
 
 // Declare aistudio on the window object
 declare global {

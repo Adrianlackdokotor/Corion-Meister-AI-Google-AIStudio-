@@ -1,4 +1,3 @@
-
 import { LibraryCategory, LibraryEntry } from '../types';
 
 const markdownContent = `
@@ -6,7 +5,7 @@ Dies ist der vollständige Satz an Fragen und Antworten, exakt aus Ihren Quellen
 
 ## Fragen und Antworten für die Anwendung (Deutsch)
 
-### I. Sicherheit, Gefahrstoffe und Organisation
+### (HF3) I. Sicherheit, Gefahrstoffe und Organisation
 
 | Nr. | Frage | Antwort | Quellen |
 | :--- | :--- | :--- | :--- |
@@ -32,7 +31,7 @@ Dies ist der vollständige Satz an Fragen und Antworten, exakt aus Ihren Quellen
 | 20 | Sie bekommen von Ihrem Lieferanten einen neuen Lack mit Gefahrenhinweisen (H226, H317, H336, H411). Welche **Maßnahmen** müssen Sie ergreifen? | Mitarbeiter unterweisen / Vorschriften; **Atemschutz tragen und Explosionsschutz** beachten; Für gute Belüftung sorgen; Lagerung beachten; Transportbedingungen beachten; Der neue Lack nur im **EX Schutz Bereich** verwenden; Zugelassene Behälter und Gebinde verwenden; Hautkontakt vermeiden. | |
 | 21 | Welche **Gefahren** kann **Strom** für den Menschen verursachen? Nennen Sie 4 Punkte. | **Stromstärke** (Stromschlag); **Stromdauer**; **Spannungshöhe**; Feuchtigkeit / schlechte Isolierung. | |
 
-### II. Umwelt, Entsorgung und Arbeitsschutzrecht
+### (HF3) II. Umwelt, Entsorgung und Arbeitsschutzrecht
 
 | Nr. | Frage | Antwort | Quellen |
 | :--- | :--- | :--- | :--- |
@@ -57,7 +56,7 @@ Dies ist der vollständige Satz an Fragen und Antworten, exakt aus Ihren Quellen
 | 40 | Welche Pflichten hat der Arbeitgeber auf den Bezug der **PSA**? | Überwachungspflicht; Fürsorgepflicht; Unterweisungspflicht; Schutzmaßnahmen ergreifen; Dokumentationspflicht; Musterprüfung. | |
 | 41 | Was ist beim Einsatz, der Reinigung und Lagerung von **Schutzhandschuhen** zu berücksichtigen? | **Tragedauer** beachten; Vor Wärmequellen und UV-Strahlung schützen; In gut belüfteten Räumen lagern; Nur passende Handschuhe verwenden; Keine defekten oder verschmutzten Handschuhe verwenden; Vor dem Ausziehen außen desinfizieren oder mit Wasser abwaschen; Handschuhe vor dem nächsten Gebrauch kontrollieren. | |
 
-### III. Auftragsabwicklung, Kalkulation und Recht
+### (HF2) III. Auftragsabwicklung, Kalkulation und Recht
 
 | Nr. | Frage | Antwort | Quellen |
 | :--- | :--- | :--- | :--- |
@@ -75,7 +74,7 @@ Dies ist der vollständige Satz an Fragen und Antworten, exakt aus Ihren Quellen
 | 53 | Nennen Sie **2 Gewährleistungsansprüche** die einen Kunden durch Mangelhafte ausgeführten Lackierarbeiten zustehen? | Preisnachlass; Schadenersatz; Nachbesserung; Rücktritt/Wandlung. | |
 | 54 | Nennen Sie **4 Rechtsfolgen** die durch die Sachfreie **Mangelabnahme** einer Handwerksleistung ausgelöst werden? | **Zahlungspflicht**; **Garantie**; **Verjährungsfrist** fängt an; **Umkehr der Beweislast**; Beginn der Gewährleistung. | |
 
-### IV. Nachkalkulation, Kostenstellen und Preise
+### (HF2) IV. Nachkalkulation, Kostenstellen und Preise
 
 | Nr. | Frage | Antwort | Quellen |
 | :--- | :--- | :--- | :--- |
@@ -89,7 +88,7 @@ Dies ist der vollständige Satz an Fragen und Antworten, exakt aus Ihren Quellen
 | 62 | Was ist die **Deckungsbeitragsrechnung**? | Berechnet den Betrag, ob unsere **Fixkosten gedeckt** sind. | |
 | 63 | Wann spricht man von einer **zeitwertgerechten Lackierung**? | Wenn **Kosten der Lackierung nicht den Wert des Fahrzeugs übersteigen**. | |
 
-### V. Qualitätsmanagement und Organisation
+### (HF3) V. Qualitätsmanagement und Organisation
 
 | Nr. | Frage | Antwort | Quellen |
 | :--- | :--- | :--- | :--- |
@@ -102,7 +101,7 @@ Dies ist der vollständige Satz an Fragen und Antworten, exakt aus Ihren Quellen
 | 70 | Was ist **QM**? | Ein System zur Sicherstellung und Verbesserung der **Qualität** von Produkten, Dienstleistungen und Prozessen. | |
 | 71 | Nennen Sie **Vorteile** eines **QM-Systems**. | Kundenzufriedenheit; Geringere Reklamationen; Besserer Marktpreis; Wettbewerbsvorteil; Vertrauen zum Kunden. | |
 
-### VI. Lackierung und Technische Kontrolle
+### (HF1) VI. Lackierung und Technische Kontrolle
 
 | Nr. | Frage | Antwort | Quellen |
 | :--- | :--- | :--- | :--- |
@@ -134,7 +133,7 @@ Dies ist der vollständige Satz an Fragen und Antworten, exakt aus Ihren Quellen
 | 97 | Welche **Kriterien** spielen bei der **Auswahl der Spritzpistole** eine Rolle? | Materialverbrauch; Gewicht (Ergonomie); Spritzbild; Zerstäubung; Düsen- und Wartungsaufwand. | |
 | 98 | Eine Spritzpistole ist von einem Lackhersteller freigegeben. Darf sie auch für andere Lackmaterialien eines anderen Lackherstellers verwendet werden? | Text aus dem Merkblatt! (Abhängig von den Vorgaben des Herstellers). | |
 
-### VII. Technische Instandsetzung und Karosserie
+### (HF1) VII. Technische Instandsetzung und Karosserie
 
 | Nr. | Frage | Antwort | Quellen |
 | :--- | :--- | :--- | :--- |
@@ -148,7 +147,7 @@ Dies ist der vollständige Satz an Fragen und Antworten, exakt aus Ihren Quellen
 | 106 | Worauf ist bei einer **Achsvermessung** alles zu achten? Nennen Sie 4. | Reifendruck; Gerade Stellung; Gerade Stellung des Lenkrads sicherstellen; Fehlwinkel Feder; Lage der Achsköpfe. | |
 | 107 | Welche **Eigenschaften** sollten **Kompressoren** aufweisen? | **Kolbenkompressor:** Laut; Geringe Kosten in der Anschaffung; Leistungsschwächer; Wartung intensiv; Einfache Bauweise; Zur Luftversorgung geeignet. **Schraubenkompressor:** Leiser; Wartungsärmer; Teurer in der Anschaffung; Gegen Kälte empfindlich. | |
 
-### VIII. Mitarbeiterführung und Schulung
+### (HF3) VIII. Mitarbeiterführung und Schulung
 
 | Nr. | Frage | Antwort | Quellen |
 | :--- | :--- | :--- | :--- |
@@ -158,7 +157,7 @@ Dies ist der vollständige Satz an Fragen und Antworten, exakt aus Ihren Quellen
 | 111 | Darf sich Ihr **Azubi eigenmächtig von der Berufsschule freistellen**? Wenn ja, unter welchen Voraussetzungen? | Nur bei unerwarteten oder unabwendbaren privaten Ereignissen (z. B. Hochzeit, Trauerfall); In solchen Fällen wird jedoch meist milder gehandelt, wenn die Abwesenheit begründet ist. | |
 | 112 | Wie müssen Sie Ihre Mitarbeiter anweisen, um mit **Gefahrstoffen** zu arbeiten? | Mitarbeiter unterweisen; Persönliche Schutzausrüstung (PSA) ausgeben; Kontrollen durchführen und auf Fehler hinweisen. | |
 
-### IX. Subunternehmer und Leiharbeiter
+### (HF3) IX. Subunternehmer und Leiharbeiter
 
 | Nr. | Frage | Antwort | Quellen |
 | :--- | :--- | :--- | :--- |
@@ -169,7 +168,7 @@ Dies ist der vollständige Satz an Fragen und Antworten, exakt aus Ihren Quellen
 | 117 | Wer **haftet für Schäden durch Nachunternehmer**? | Immer der **Auftraggeber**. | |
 | 118 | Darf die **Beauftragung (von Subunternehmern) ohne Genehmigung** von statten gehen? | **Nein**, nur nach Absprache mit dem Kunden. | |
 
-### X. Übergabe und Service
+### (HF2) X. Übergabe und Service
 
 | Nr. | Frage | Antwort | Quellen |
 | :--- | :--- | :--- | :--- |
@@ -179,7 +178,7 @@ Dies ist der vollständige Satz an Fragen und Antworten, exakt aus Ihren Quellen
 | 122 | Nennen Sie **2 Zusatznutzen für Privatkunden**. | Auto waschen/saugen/polieren/aufräumen; Hol- und Bringservice; Leihwagen. | |
 | 123 | Nennen Sie Ihre **Kundengruppen**. | Privatkunden; Firmenkunden; Öffentliche Kunden (Gemeinden, Stadt, öffentliche Dienste). | |
 
-### XI. Marketing und Betriebswirtschaft
+### (HF3) XI. Marketing und Betriebswirtschaft
 
 | Nr. | Frage | Antwort | Quellen |
 | :--- | :--- | :--- | :--- |
@@ -198,7 +197,7 @@ Dies ist der vollständige Satz an Fragen und Antworten, exakt aus Ihren Quellen
 | 136 | Nennen Sie die **grundlegenden Merkmale für alle Schriften**. | Schriftlinie oder Schriftgrundlinie; Oberlänge; Dichte; Verhältnis Oberlinie zum Unterlänge; Vor- und Nachbreite. | |
 | 137 | Nennen Sie die **Gesetzmäßigkeiten der Typografie**. | **Serifen:** Buchstabenverzierung; **Kursiv:** Schrägstellung der Schrift; **Spationieren:** Ausgleich des Buchstabenabstands. | |
 
-### XII. Sonstiges und Akronyme
+### (HF3) XII. Sonstiges und Akronyme
 
 | Nr. | Frage | Antwort | Quellen |
 | :--- | :--- | :--- | :--- |

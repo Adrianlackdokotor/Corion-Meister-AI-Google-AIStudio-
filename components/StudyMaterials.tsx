@@ -1,5 +1,6 @@
+
 import React, { useState, useEffect } from 'react';
-import { LibraryCategory, LibraryEntry } from '../types';
+import { LibraryCategory, LibraryEntry, User } from '../types';
 import { Icon } from './Icon';
 import { processFile } from '../utils/fileProcessor';
 import { generateLibraryEntriesFromText } from '../services/geminiService';
@@ -83,13 +84,17 @@ const AddEditModal: React.FC<{
     );
 };
 
+const AI_PROCESSING_COST = 250;
+
 // Modal for processing materials with AI
 const AiProcessingModal: React.FC<{
     isOpen: boolean;
     onClose: () => void;
     onBulkAdd: (entries: { question: string, answer: string, categoryTitle: string }[]) => void;
     categories: LibraryCategory[];
-}> = ({ isOpen, onClose, onBulkAdd, categories }) => {
+    currentUser: User;
+    consumeCredits: (amount: number, description: string) => boolean;
+}> = ({ isOpen, onClose, onBulkAdd, categories, currentUser, consumeCredits }) => {
     const [activeTab, setActiveTab] = useState<'upload' | 'text'>('upload');
     const [extractedText, setExtractedText] = useState('');
     const [isProcessingFile, setIsProcessingFile] = useState(false);
@@ -132,6 +137,12 @@ const AiProcessingModal: React.FC<{
             setError('Kein Text zum Verarbeiten vorhanden.');
             return;
         }
+        
+        if (!consumeCredits(AI_PROCESSING_COST, 'Lernmaterial mit AI verarbeitet')) {
+            setError('Guthaben nicht ausreichend.');
+            return;
+        }
+
         setError('');
         setIsGenerating(true);
         try {
@@ -144,6 +155,8 @@ const AiProcessingModal: React.FC<{
             setIsGenerating(false);
         }
     };
+    
+    const hasCredits = currentUser.credits >= AI_PROCESSING_COST;
 
     if (!isOpen) return null;
 
@@ -205,8 +218,8 @@ const AiProcessingModal: React.FC<{
 
                 <div className="mt-6 flex justify-end gap-4">
                     <button onClick={handleClose} disabled={isGenerating} className="px-4 py-2 bg-gray-600 rounded-lg hover:bg-gray-500 disabled:opacity-50">Abbrechen</button>
-                    <button onClick={handleGenerate} disabled={!extractedText || isGenerating || isProcessingFile} className="px-4 py-2 bg-red-600 rounded-lg hover:bg-red-700 disabled:opacity-50">
-                        {isGenerating ? 'Wird generiert...' : 'Generieren'}
+                    <button onClick={handleGenerate} disabled={!extractedText || isGenerating || isProcessingFile || !hasCredits} className="px-4 py-2 bg-red-600 rounded-lg hover:bg-red-700 disabled:opacity-50">
+                        {isGenerating ? 'Wird generiert...' : `Generieren (-${AI_PROCESSING_COST} Hub+1)`}
                     </button>
                 </div>
             </div>
@@ -221,8 +234,9 @@ interface StudyMaterialsProps {
   onUpdateEntry: (entry: LibraryEntry, categoryTitle: string) => void;
   onDeleteEntry: (entryId: string, categoryTitle: string) => void;
   onBulkAdd: (entries: { question: string, answer: string, categoryTitle: string }[]) => void;
-  // FIX: Add onDeleteCategory to props to resolve error in App.tsx.
   onDeleteCategory: (categoryTitle: string) => void;
+  currentUser: User;
+  consumeCredits: (amount: number, description: string) => boolean;
 }
 
 
@@ -255,8 +269,7 @@ const LibraryCard: React.FC<{
   </div>
 );
 
-// FIX: Add onDeleteCategory to props to resolve error in App.tsx.
-const StudyMaterials: React.FC<StudyMaterialsProps> = ({ library, onAddEntry, onUpdateEntry, onDeleteEntry, onBulkAdd, onDeleteCategory }) => {
+const StudyMaterials: React.FC<StudyMaterialsProps> = ({ library, onAddEntry, onUpdateEntry, onDeleteEntry, onBulkAdd, onDeleteCategory, currentUser, consumeCredits }) => {
     const [isAddEditModalOpen, setIsAddEditModalOpen] = useState(false);
     const [isAiModalOpen, setIsAiModalOpen] = useState(false);
     const [entryToEdit, setEntryToEdit] = useState<LibraryEntry | null>(null);
@@ -298,9 +311,11 @@ const StudyMaterials: React.FC<StudyMaterialsProps> = ({ library, onAddEntry, on
              <button 
                 onClick={() => setIsAiModalOpen(true)}
                 className="px-4 py-2 bg-red-600 text-white font-semibold rounded-lg hover:bg-red-700 flex items-center gap-2"
+                disabled={currentUser.credits < AI_PROCESSING_COST}
+                title="Laden Sie eine Datei hoch oder fügen Sie Text ein, um automatisch Lernkarten zu erstellen."
             >
                 <Icon name="ai-process" className="h-5 w-5" />
-                Materialien mit AI verarbeiten
+                {`Mit AI verarbeiten (-${AI_PROCESSING_COST} Hub+1)`}
             </button>
         </div>
       </div>
@@ -309,7 +324,6 @@ const StudyMaterials: React.FC<StudyMaterialsProps> = ({ library, onAddEntry, on
         {library.length > 0 ? (
           library.map((category) => (
             <section key={category.title}>
-              {/* FIX: Add delete button for user-created categories */}
               <div className="flex justify-between items-center mb-4 pb-2 border-b-2 border-gray-700">
                 <h3 className="text-xl font-bold text-red-500">{category.title}</h3>
                 {category.isUserCreated && (
@@ -365,6 +379,8 @@ const StudyMaterials: React.FC<StudyMaterialsProps> = ({ library, onAddEntry, on
         onClose={() => setIsAiModalOpen(false)}
         onBulkAdd={onBulkAdd}
         categories={library}
+        currentUser={currentUser}
+        consumeCredits={consumeCredits}
       />
     </div>
   );
