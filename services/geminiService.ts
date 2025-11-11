@@ -1,5 +1,5 @@
 import { GoogleGenAI, Chat, GenerateContentResponse, Modality, Type, LiveSession, LiveServerMessage, CloseEvent, ErrorEvent, FunctionDeclaration } from '@google/genai';
-import { FlashcardEvaluation, MultipleChoiceQuestion, Flashcard, Language, LibraryCategory, LibraryEntry } from '../types';
+import { FlashcardEvaluation, MultipleChoiceQuestion, Flashcard, Language, LibraryCategory, LibraryEntry, MateMaterial, FormelFlashcard } from '../types';
 
 if (!process.env.API_KEY) {
   console.warn("API_KEY environment variable not set. VEO features may require user selection.");
@@ -412,5 +412,132 @@ export const generateLibraryEntriesFromText = async (
   } catch (error) {
     console.error("Failed to generate library entries:", error);
     throw new Error('Fehler bei der AI-Generierung von Bibliothekeinträgen.');
+  }
+};
+
+// --- MATE Kalkulation Explanation ---
+export const explainTextSelection = async (
+  selectedText: string,
+  fullContext: string,
+  language: Language
+): Promise<string> => {
+  const ai = getAIClient();
+  const prompt = `
+    Du bist "Lackierer-Meister Corion", ein KI-Lerncoach.
+    Ein Schüler hat einen Textabschnitt aus einem Lernmaterial markiert und bittet um eine Erklärung.
+    Erkläre den markierten Abschnitt einfach und klar, im Kontext des gesamten Dokuments.
+
+    **Gesamtes Dokument (Kontext):**
+    ---
+    ${fullContext}
+    ---
+
+    **Vom Schüler markierter Text:**
+    ---
+    ${selectedText}
+    ---
+
+    **Deine Aufgabe:**
+    Erstelle eine kurze, hilfreiche Erklärung für den markierten Text.
+    **WICHTIG: Die Erklärung muss in der Sprache "${language}" verfasst sein.**
+  `;
+  try {
+    const response = await ai.models.generateContent({
+      model: 'gemini-2.5-flash',
+      contents: prompt,
+    });
+    return response.text;
+  } catch (error) {
+    console.error("Failed to explain text selection:", error);
+    throw new Error('Fehler bei der AI-Erklärung.');
+  }
+};
+
+// --- MATE Kalkulation Material Generation ---
+export const generateMateMaterialFromText = async (
+  extractedText: string
+): Promise<Pick<MateMaterial, 'title' | 'content'>> => {
+    const ai = getAIClient();
+    const prompt = `
+      Du bist ein Experte für Lackiertechnik und Betriebswirtschaft. Deine Aufgabe ist es, einen unstrukturierten Text in ein sauberes, formatiertes Lernmaterial für die "Kalkulation"-Bibliothek umzuwandeln.
+      Analysiere den folgenden Text und erstelle einen passenden Titel und einen gut strukturierten Inhalt im Markdown-Format.
+
+      **Roh-Text zum Analysieren:**
+      ---
+      ${extractedText}
+      ---
+
+      **Deine Antwort muss ein valides JSON-Objekt sein mit den Schlüsseln "title" und "content".**
+      - 'title': Ein kurzer, prägnanter Titel für das Lernmaterial.
+      - 'content': Der formatierte Inhalt in Markdown (Überschriften, Listen, fette Schrift etc. verwenden).
+    `;
+
+    try {
+        const response = await ai.models.generateContent({
+            model: 'gemini-2.5-flash',
+            contents: prompt,
+            config: {
+                responseMimeType: 'application/json',
+                responseSchema: {
+                    type: Type.OBJECT,
+                    properties: {
+                        title: { type: Type.STRING, description: "Der generierte Titel." },
+                        content: { type: Type.STRING, description: "Der Inhalt in Markdown formatiert." }
+                    },
+                    required: ['title', 'content'],
+                },
+            },
+        });
+        const jsonString = response.text.trim();
+        return JSON.parse(jsonString);
+    } catch (error) {
+        console.error("Failed to generate MATE material:", error);
+        throw new Error('Fehler bei der AI-Generierung von Kalkulationsmaterial.');
+    }
+};
+
+// --- Formula Flashcard Generation ---
+export const generateFormelFlashcardsFromText = async (
+  extractedText: string
+): Promise<Omit<FormelFlashcard, 'id'>[]> => {
+  const ai = getAIClient();
+  const prompt = `
+    Du bist ein Experte für Lackiertechnik und Betriebswirtschaft. Deine Aufgabe ist es, aus einem Text Formeln zu extrahieren und sie als Lernkarten aufzubereiten.
+    Analysiere den folgenden Text und erstelle eine Liste von Lernkarten.
+
+    **Text zum Analysieren:**
+    ---
+    ${extractedText}
+    ---
+
+    **Deine Antwort muss ein valides JSON-Array sein.** Jedes Objekt im Array muss die folgenden Schlüssel enthalten:
+    - 'front': Der Name der Formel (z.B., "Werkstoffverbrauch").
+    - 'back': Eine Zeichenkette, die die mathematische Formel und ein konkretes Rechenbeispiel enthält. Formatiere dies klar und lesbar, z.B., "Formel: ...\\n\\nRechenbeispiel: ...".
+  `;
+
+  try {
+    const response = await ai.models.generateContent({
+      model: 'gemini-2.5-flash',
+      contents: prompt,
+      config: {
+        responseMimeType: 'application/json',
+        responseSchema: {
+          type: Type.ARRAY,
+          items: {
+            type: Type.OBJECT,
+            properties: {
+              front: { type: Type.STRING, description: "Der Name der Formel." },
+              back: { type: Type.STRING, description: "Die Formel und ein Rechenbeispiel, klar formatiert." }
+            },
+            required: ['front', 'back'],
+          }
+        },
+      },
+    });
+    const jsonString = response.text.trim();
+    return JSON.parse(jsonString);
+  } catch (error) {
+    console.error("Failed to generate formula flashcards:", error);
+    throw new Error('Fehler bei der AI-Generierung von Formel-Lernkarten.');
   }
 };

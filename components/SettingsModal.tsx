@@ -81,6 +81,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
                 onChange={(e) => setLanguage(e.target.value as Language)}
                 className="w-full p-2 bg-gray-700 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 text-white"
             >
+                <option value="German">Deutsch</option>
                 <option value="Romanian">Română</option>
                 <option value="English">English</option>
                 <option value="Polish">Polski</option>

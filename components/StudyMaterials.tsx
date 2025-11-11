@@ -221,6 +221,8 @@ interface StudyMaterialsProps {
   onUpdateEntry: (entry: LibraryEntry, categoryTitle: string) => void;
   onDeleteEntry: (entryId: string, categoryTitle: string) => void;
   onBulkAdd: (entries: { question: string, answer: string, categoryTitle: string }[]) => void;
+  // FIX: Add onDeleteCategory to props to resolve error in App.tsx.
+  onDeleteCategory: (categoryTitle: string) => void;
 }
 
 
@@ -253,7 +255,8 @@ const LibraryCard: React.FC<{
   </div>
 );
 
-const StudyMaterials: React.FC<StudyMaterialsProps> = ({ library, onAddEntry, onUpdateEntry, onDeleteEntry, onBulkAdd }) => {
+// FIX: Add onDeleteCategory to props to resolve error in App.tsx.
+const StudyMaterials: React.FC<StudyMaterialsProps> = ({ library, onAddEntry, onUpdateEntry, onDeleteEntry, onBulkAdd, onDeleteCategory }) => {
     const [isAddEditModalOpen, setIsAddEditModalOpen] = useState(false);
     const [isAiModalOpen, setIsAiModalOpen] = useState(false);
     const [entryToEdit, setEntryToEdit] = useState<LibraryEntry | null>(null);
@@ -306,7 +309,23 @@ const StudyMaterials: React.FC<StudyMaterialsProps> = ({ library, onAddEntry, on
         {library.length > 0 ? (
           library.map((category) => (
             <section key={category.title}>
-              <h3 className="text-xl font-bold text-red-500 mb-4 pb-2 border-b-2 border-gray-700">{category.title}</h3>
+              {/* FIX: Add delete button for user-created categories */}
+              <div className="flex justify-between items-center mb-4 pb-2 border-b-2 border-gray-700">
+                <h3 className="text-xl font-bold text-red-500">{category.title}</h3>
+                {category.isUserCreated && (
+                    <button
+                        onClick={() => {
+                            if (window.confirm(`Sind Sie sicher, dass Sie die Kategorie "${category.title}" und alle darin enthaltenen Fragen löschen möchten?`)) {
+                                onDeleteCategory(category.title);
+                            }
+                        }}
+                        className="text-gray-400 hover:text-red-500 p-1"
+                        title="Kategorie löschen"
+                    >
+                        <Icon name="trash" className="h-5 w-5" />
+                    </button>
+                )}
+              </div>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                 {category.entries.map((entry) => {
                     const isUserGenerated = entry.id.startsWith('user-');

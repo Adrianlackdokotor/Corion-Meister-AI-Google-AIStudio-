@@ -10,6 +10,7 @@ export interface Flashcard {
   back: string;
   masteryLevel: number; // NS 0-5
   backgroundImageUrl?: string;
+  imageUrl?: string; 
 }
 
 export interface FlashcardEvaluation {
@@ -41,11 +42,13 @@ export interface LibraryEntry {
   id: string;
   question: string;
   answer: string;
+  imageUrl?: string;
 }
 
 export interface LibraryCategory {
   title: string;
   entries: LibraryEntry[];
+  isUserCreated?: boolean;
 }
 
 export interface FachgespraechTopic {
@@ -54,12 +57,26 @@ export interface FachgespraechTopic {
   content: string;
 }
 
-export type Language = 'Romanian' | 'English' | 'Polish';
+export type Language = 'German' | 'Romanian' | 'English' | 'Polish';
 
 export interface User {
   email: string;
   credits: number;
   tier: 'admin' | 'user';
+}
+
+export interface MateMaterial {
+  id: string;
+  title: string;
+  content: string; // Markdown content
+  isUserCreated?: boolean;
+}
+
+export interface FormelFlashcard {
+  id: string;
+  front: string; // Name der Formel
+  back: string;  // Formel + Rechenbeispiel
+  isUserCreated?: boolean;
 }
 
 
@@ -101,6 +118,9 @@ declare global {
     start(): void;
     stop(): void;
   }
+
+  // For Markdown parsing
+  const marked: any;
 
   interface Window {
     // FIX: Made the 'aistudio' property optional to resolve declaration conflict.

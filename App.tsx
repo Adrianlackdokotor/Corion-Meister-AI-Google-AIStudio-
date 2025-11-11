@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useMemo } from 'react';
 import ChatInterface from './components/ChatInterface';
 import Flashcards from './components/Flashcards';
@@ -8,13 +7,17 @@ import Login from './components/Login';
 import StudyMaterials from './components/StudyMaterials';
 import SettingsModal from './components/SettingsModal';
 import { Icon } from './components/Icon';
-import { LibraryCategory, LibraryEntry, FachgespraechTopic, Language, User } from './types';
+import { LibraryCategory, LibraryEntry, FachgespraechTopic, Language, User, MateMaterial, FormelFlashcard } from './types';
 import { parsedLibraryData } from './data/libraryData';
+import { initialMateData } from './data/mateData';
+import { initialFormelnData } from './data/formelnData';
 import { AudioManager } from './utils/audioManager';
+import MateFormeln from './components/MateFormeln';
+import MateKalkulation from './components/MateKalkulation';
 
-type Feature = 'chat' | 'flashcards' | 'multipleChoice' | 'fachgespraech' | 'studyMaterials';
+type Feature = 'chat' | 'flashcards' | 'multipleChoice' | 'fachgespraech' | 'studyMaterials' | 'mate-formeln' | 'mate-kalkulation';
 
-const logoBase64 = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAABDgAAAG+CAYAAABVVl3fAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhcwAADsMAAA7DAcdvqGAAAP+lSURBVHhe7J0FnFRF1sf7l5CAJCRkIYSQhAwhhEAEBEFFVFDEgoCiIBZFRERBQRQVUREEFEFAECggISQhJJCQhExI+v/3zN7d7OzuzO7s7EhyPvd5Pp+cnZmdnZ3Z2Zmd7713Zmd2d0IIoYqjiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqg-n-";
+const logoBase64 = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAABDgAAAG+CAYAAABVVl3fAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhcwAADsMAAA7DAcdvqGAAAP+lSURBVHhe7J0FnFRF1sf7l5CAJCRkIYSQhAwhhEAEBEFFVFDEgoCiIBZFRERBQRQVUREEFEFAECggISQhJJCQhExI+v/3zN7d7OzuzO7s7EhyPvd5Pp+cnZmdnZ3Z2Zmd7713Zmd2d0IIoYqjiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqg-n-";
 
 const App: React.FC = () => {
   const [currentUser, setCurrentUser] = useState<User | null>(() => {
@@ -35,6 +38,7 @@ const App: React.FC = () => {
   const [activeFeature, setActiveFeature] = useState<Feature>('flashcards');
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [isMateMenuOpen, setIsMateMenuOpen] = useState(false);
   
   const [userLibrary, setUserLibrary] = useState<LibraryCategory[]>(() => {
     try {
@@ -46,6 +50,29 @@ const App: React.FC = () => {
     } catch (error) { console.error("Could not parse user library from localStorage", error); }
     return [];
   });
+
+   const [mateMaterials, setMateMaterials] = useState<MateMaterial[]>(() => {
+    try {
+      const saved = localStorage.getItem('mateMaterials');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed)) return parsed;
+      }
+    } catch (error) { console.error("Could not parse mate materials from localStorage", error); }
+    return initialMateData;
+  });
+
+  const [formelFlashcards, setFormelFlashcards] = useState<FormelFlashcard[]>(() => {
+    try {
+      const saved = localStorage.getItem('formelFlashcards');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed)) return parsed;
+      }
+    } catch (error) { console.error("Could not parse formula flashcards from localStorage", error); }
+    return initialFormelnData;
+  });
+
 
   const studyLibrary = useMemo(() => {
       const merged: LibraryCategory[] = JSON.parse(JSON.stringify(parsedLibraryData)); // Deep copy base library
@@ -76,7 +103,7 @@ const App: React.FC = () => {
   });
   const [language, setLanguage] = useState<Language>(() => {
     const saved = localStorage.getItem('app_language');
-    return (saved as Language) || 'Romanian';
+    return (saved as Language) || 'German';
   });
 
   const audioManager = useMemo(() => new AudioManager(volume, isMuted), [volume, isMuted]);
@@ -108,6 +135,14 @@ const App: React.FC = () => {
   useEffect(() => {
     localStorage.setItem('app_language', language);
   }, [language]);
+
+  useEffect(() => {
+    localStorage.setItem('mateMaterials', JSON.stringify(mateMaterials));
+  }, [mateMaterials]);
+
+  useEffect(() => {
+    localStorage.setItem('formelFlashcards', JSON.stringify(formelFlashcards));
+  }, [formelFlashcards]);
 
 
   const studyMaterials = useMemo(() => {
@@ -184,7 +219,7 @@ const App: React.FC = () => {
                     newLibrary.push(category);
                 } else {
                     // If category doesn't exist anywhere, create it in the user library
-                    category = { title: newEntryData.categoryTitle, entries: [] };
+                    category = { title: newEntryData.categoryTitle, entries: [], isUserCreated: true };
                     newLibrary.push(category);
                 }
             }
@@ -198,6 +233,49 @@ const App: React.FC = () => {
         return newLibrary;
     });
 };
+
+const handleDeleteCategory = (categoryTitle: string) => {
+    setUserLibrary(prev => prev.filter(cat => cat.title !== categoryTitle));
+};
+
+  const handleAddMateMaterial = (newMaterial: Omit<MateMaterial, 'id'>) => {
+    setMateMaterials(prev => [
+      ...prev,
+      { ...newMaterial, id: `user-${Date.now()}`, isUserCreated: true }
+    ]);
+  };
+
+  const handleUpdateMateMaterial = (updatedMaterial: MateMaterial) => {
+    setMateMaterials(prev => prev.map(m => m.id === updatedMaterial.id ? updatedMaterial : m));
+  };
+  
+  const handleDeleteMateMaterial = (materialId: string) => {
+    setMateMaterials(prev => prev.filter(m => m.id !== materialId));
+  };
+
+  const handleAddFormelFlashcard = (newCard: Omit<FormelFlashcard, 'id'>) => {
+    setFormelFlashcards(prev => [
+        ...prev,
+        { ...newCard, id: `user-formel-${Date.now()}`, isUserCreated: true }
+    ]);
+  };
+
+  const handleUpdateFormelFlashcard = (updatedCard: FormelFlashcard) => {
+      setFormelFlashcards(prev => prev.map(c => c.id === updatedCard.id ? updatedCard : c));
+  };
+
+  const handleDeleteFormelFlashcard = (cardId: string) => {
+      setFormelFlashcards(prev => prev.filter(c => c.id !== cardId));
+  };
+
+  const handleBulkAddFormelFlashcards = (newCards: Omit<FormelFlashcard, 'id'>[]) => {
+      const cardsToAdd = newCards.map(card => ({
+          ...card,
+          id: `user-formel-${Date.now()}-${Math.random()}`,
+          isUserCreated: true,
+      }));
+      setFormelFlashcards(prev => [...prev, ...cardsToAdd]);
+  };
 
 
   useEffect(() => {
@@ -227,7 +305,6 @@ const App: React.FC = () => {
       case 'chat':
         return <ChatInterface {...props} />;
       case 'flashcards':
-        // FIX: Pass the 'studyLibrary' prop to the Flashcards component.
         return <Flashcards {...props} studyLibrary={studyLibrary} />;
       case 'multipleChoice':
         return <MultipleChoice {...props} />;
@@ -240,9 +317,25 @@ const App: React.FC = () => {
                     onUpdateEntry={handleUpdateLibraryEntry}
                     onDeleteEntry={handleDeleteLibraryEntry}
                     onBulkAdd={handleBulkAddLibraryEntries}
+                    onDeleteCategory={handleDeleteCategory}
+                />;
+      case 'mate-formeln':
+        return <MateFormeln 
+                  flashcards={formelFlashcards}
+                  onAddCard={handleAddFormelFlashcard}
+                  onUpdateCard={handleUpdateFormelFlashcard}
+                  onDeleteCard={handleDeleteFormelFlashcard}
+                  onBulkAddCards={handleBulkAddFormelFlashcards}
+              />;
+      case 'mate-kalkulation':
+        return <MateKalkulation 
+                    materials={mateMaterials}
+                    onAddMaterial={handleAddMateMaterial}
+                    onUpdateMaterial={handleUpdateMateMaterial}
+                    onDeleteMaterial={handleDeleteMateMaterial}
+                    language={language}
                 />;
       default:
-        // FIX: Pass the 'studyLibrary' prop to the Flashcards component.
         return <Flashcards {...props} studyLibrary={studyLibrary} />;
     }
   };
@@ -284,6 +377,27 @@ const App: React.FC = () => {
         <NavButton feature="multipleChoice" label="Multiple Choice Fragen" iconName="list" />
         <NavButton feature="fachgespraech" label="Praktische Prüfung" iconName="exam" />
         <NavButton feature="studyMaterials" label="Lernbibliothek" iconName="book" />
+        <div>
+            <button
+                onClick={() => {
+                    setIsMateMenuOpen(!isMateMenuOpen);
+                    audioManager.play('click');
+                }}
+                className="flex items-center justify-between w-full text-left px-4 py-3 rounded-lg transition-colors duration-200 text-gray-300 hover:bg-gray-700 hover:text-white"
+            >
+                <div className="flex items-center">
+                    <Icon name="calculator" className="h-6 w-6 mr-3" />
+                    <span>MATE</span>
+                </div>
+                <Icon name="chevron-down" className={`h-5 w-5 transition-transform duration-200 ${isMateMenuOpen ? 'rotate-180' : ''}`} />
+            </button>
+            {isMateMenuOpen && (
+                <div className="pl-8 space-y-1 mt-1">
+                    <NavButton feature="mate-formeln" label="Formeln" iconName="formula" /> 
+                    <NavButton feature="mate-kalkulation" label="Kalkulation" iconName="calculation-list" />
+                </div>
+            )}
+        </div>
         <NavButton feature="chat" label="Lackierer-Meister" iconName="chat" />
       </div>
       <div className="mt-auto pt-4 border-t border-gray-700">

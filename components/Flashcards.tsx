@@ -8,6 +8,15 @@ import { AudioManager } from '../utils/audioManager';
 
 type Category = LibraryCategory;
 
+const shuffleArray = <T,>(array: T[]): T[] => {
+    const newArray = [...array];
+    for (let i = newArray.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+    }
+    return newArray;
+};
+
 interface FlashcardViewerProps {
     category: Category;
     cards: Flashcard[];
@@ -76,11 +85,6 @@ const FlashcardViewer: React.FC<FlashcardViewerProps> = ({ category, cards, onBa
     };
 
 
-    useEffect(() => {
-        // Reset state when the card changes
-        resetCardState();
-    }, [currentIndex, cards]);
-
     const resetCardState = () => {
         setIsAnswerVisible(false);
         setUserAnswer('');
@@ -91,6 +95,13 @@ const FlashcardViewer: React.FC<FlashcardViewerProps> = ({ category, cards, onBa
             setIsRecording(false);
         }
     };
+    
+    useEffect(() => {
+        // Reset state only when the card's ID changes (i.e., user navigates to a new card)
+        // This prevents the state from resetting when mastery level updates.
+        resetCardState();
+    }, [currentCard?.id]);
+
 
     const goToPrevCard = () => {
         audioManager.play('click');
@@ -327,7 +338,8 @@ const Flashcards: React.FC<FlashcardsProps> = ({ audioManager, language, studyLi
         );
     }, [studyLibrary, cardProgress]);
     
-    const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
+    const [cardsForViewing, setCardsForViewing] = useState<Flashcard[] | null>(null);
+    const [viewingCategory, setViewingCategory] = useState<Category | null>(null);
     const [isResetConfirmOpen, setIsResetConfirmOpen] = useState(false);
 
     const handleResetProgress = () => {
@@ -374,13 +386,31 @@ const Flashcards: React.FC<FlashcardsProps> = ({ audioManager, language, studyLi
         });
     };
 
-    if (selectedCategory) {
-        const categoryCards = cards.filter(card => card.categoryId === selectedCategory.title);
+    const handleSelectCategory = (category: Category) => {
+        const categoryCards = cards.filter(c => c.categoryId === category.title);
+        setCardsForViewing(shuffleArray(categoryCards));
+        setViewingCategory(category);
+        audioManager.play('click');
+    };
+
+    const handleSelectAllRandom = () => {
+        setCardsForViewing(shuffleArray(cards));
+        setViewingCategory({ title: 'Alle Karten (Zufällig)', entries: [] });
+        audioManager.play('click');
+    };
+
+    const handleBackToSelection = () => {
+        setCardsForViewing(null);
+        setViewingCategory(null);
+        audioManager.play('click');
+    };
+
+    if (viewingCategory && cardsForViewing) {
         return (
             <FlashcardViewer 
-                category={selectedCategory} 
-                cards={categoryCards}
-                onBack={() => setSelectedCategory(null)} 
+                category={viewingCategory} 
+                cards={cardsForViewing}
+                onBack={handleBackToSelection} 
                 onUpdateCardMastery={handleUpdateCardMastery}
                 onUpdateCardImage={handleUpdateCardImage}
                 audioManager={audioManager}
@@ -410,6 +440,18 @@ const Flashcards: React.FC<FlashcardsProps> = ({ audioManager, language, studyLi
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 overflow-y-auto p-1">
+                <button 
+                    onClick={handleSelectAllRandom}
+                    className="p-6 bg-red-800 rounded-lg text-left hover:bg-red-700 hover:ring-2 hover:ring-red-500 transition-all duration-200 flex flex-col justify-between min-h-[12rem] md:col-span-1 lg:col-span-1"
+                >
+                    <div>
+                        <h3 className="text-xl font-bold text-white">Alle Karten (Zufällig)</h3>
+                        <p className="text-sm text-gray-400 mt-1">Testen Sie Ihr Wissen über alle Themen hinweg.</p>
+                    </div>
+                    <div className="mt-4">
+                        <p className="font-semibold text-lg text-red-200">{cards.length} Karten insgesamt</p>
+                    </div>
+                </button>
                 {studyLibrary.map(category => {
                     const categoryCards = cards.filter(c => c.categoryId === category.title);
                     const total = categoryCards.length;
@@ -425,7 +467,7 @@ const Flashcards: React.FC<FlashcardsProps> = ({ audioManager, language, studyLi
                     return (
                         <button 
                             key={category.title} 
-                            onClick={() => { setSelectedCategory(category); audioManager.play('click'); }}
+                            onClick={() => handleSelectCategory(category)}
                             className="p-6 bg-gray-800 rounded-lg text-left hover:bg-gray-700 hover:ring-2 hover:ring-red-500 transition-all duration-200 flex flex-col justify-between min-h-[12rem]"
                         >
                             <div>

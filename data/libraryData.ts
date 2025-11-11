@@ -213,6 +213,19 @@ Dies ist der vollständige Satz an Fragen und Antworten, exakt aus Ihren Quellen
 | 146 | Was muss bei **Hilfsmitteln** (z.B. Kleben, Schweißen) beachtet werden? | Schutzvorkehrungen; Trennmittel; Kleben → Klebeflächen vorbereiten; Schweißen → Vorschrift einhalten, richtige Stromstärke; Nieten → Abstände kontrollieren, passende Nieten einsetzen. | |
 | 147 | Nennen Sie **5 Maßnahmen**, die Sie im Beruf oder **Epoxidharz-Sicherheitskonzept** aufnehmen. | Schleifstaub nach Möglichkeit entfernen; Kontrolle der Einhaltung des Arbeitsschutzes; Einwandfreie Kleidung vorschreiben; Absaugvorrichtungen an vorgesehenen Plätzen verwenden; Ausreichende Belüftung im Lackierraum. | |
 | 148 | Nennen Sie **Angaben und Dokumente** zu einem **Explosionsschutzdokument**. | Gefährdungsbeurteilung; Betriebsanweisung; Unterweisung; Prüfbescheinigung; Sicherheitsdatenblatt; EX-Schutz (Explosionsschutz) der Maschinen; Arbeitserlaubnis; Bescheinigung. | |
+
+### MATE - Tabele
+
+| Nr. | Frage | Antwort | Quellen |
+| :--- | :--- | :--- | :--- |
+| 149 | Cum se calculează **Werkstoffkosten** (costul materialelor consumate)? | Formulă: Verbrauch = Anfangsbestand + Zugänge - Endbestand. Exemplu: 11.500 + 127.290 - 11.200 = 127.590 €. | MATE |
+| 150 | Cum se calculează **Lohnkosten direkt verrechenbar** (costuri directe cu forța de muncă)? | Gesellenlöhne direkt (după corecții) + 50% Ausbildungsvergütung (ucenici) + Produktiver Anteil Meister/Techniker. Exemplu: 400.715 + 12.030 + 33.000 = 445.745 €. | MATE |
+| 151 | Cum se calculează **Gesamtkosten** (costurile totale)? | Werkstoffe + Direkte Löhne + Gemeinkosten + Sondereinzelkosten. Exemplu: 127.590 + 445.745 + 612.030 + 55.000 = 1.240.365 €. | MATE |
+| 152 | Cum se calculează **Betriebsergebnis** (rezultatul operațional)? | Formulă: Betriebsleistung - Gesamtkosten. Exemplu: 1.831.840 - 1.240.365 = 591.475 €. | MATE |
+| 153 | Cum se calculează **Gemeinkostenzuschlag** (suprataxa de cheltuieli generale)? | Formulă: (Gemeinkosten ÷ Direkt verrechenbare Lohnkosten) × 100. Exemplu: (612.030 ÷ 445.745) × 100 = 137.3%. | MATE |
+| 154 | Cum se calculează **Lohnkostenpreis** (prețul orar de manoperă)? | Formulă: Durchschnittslohn × Faktor (Basislohn + GK-Zuschlag + Wagnis & Gewinn). Exemplu: 17.58 € × 2.5628 = 45.05 €/Std. | MATE |
+| 155 | De ce sunt **salariile directe** (Gesellen, Azubi, Meister) singurele ore facturabile direct clienților? | Deoarece acestea sunt singurele ore care pot fi atribuite direct unui proiect specific. Acestea apar la numitor în calculul suprataxei de cheltuieli generale (GK-Zuschlag). | MATE |
+| 156 | De ce se contabilizează **materialele pe 'consum'** și nu pe achiziții? | Pentru a reflecta exact ce a fost folosit într-o perioadă, folosind formula: Stoc inițial + Intrări − Stoc final. | MATE |
 `;
 
 function parseMarkdownLibrary(markdown: string): LibraryCategory[] {
