@@ -1,10 +1,16 @@
-
 import React, { useState } from 'react';
 import { generateImage } from '../services/geminiService';
 import Loader from './Loader';
 import { Icon } from './Icon';
 
 const aspectRatios = ["1:1", "3:4", "4:3", "9:16", "16:9"];
+
+const imageGenMessages = [
+    "Interpretiere den Prompt...",
+    "Wähle einen visuellen Stil...",
+    "Generiere das Bild...",
+    "Füge Details hinzu..."
+];
 
 const ImageGenerator: React.FC = () => {
   const [prompt, setPrompt] = useState('');
@@ -73,7 +79,7 @@ const ImageGenerator: React.FC = () => {
         {/* Display Area */}
         <div className="md:w-2/3 bg-gray-800 rounded-lg flex items-center justify-center p-4 overflow-auto border border-gray-700">
           {isLoading ? (
-            <Loader text="Creating your image..." />
+            <Loader text={imageGenMessages} />
           ) : generatedImage ? (
             <img src={generatedImage} alt="Generated" className="max-h-full max-w-full object-contain rounded-md" />
           ) : (

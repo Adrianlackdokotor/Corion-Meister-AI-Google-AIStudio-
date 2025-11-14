@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { LibraryCategory, LibraryEntry, User } from '../types';
 import { Icon } from './Icon';
@@ -86,6 +85,13 @@ const AddEditModal: React.FC<{
 
 const AI_PROCESSING_COST = 250;
 
+const aiProcessingMessages = [
+    "Analysiere das Dokument...",
+    "Extrahiere Schlüsselkonzepte...",
+    "Formuliere Fragen und Antworten...",
+    "Strukturiere die neuen Lernkarten..."
+];
+
 // Modal for processing materials with AI
 const AiProcessingModal: React.FC<{
     isOpen: boolean;
@@ -168,7 +174,7 @@ const AiProcessingModal: React.FC<{
 
                 {isGenerating ? (
                     <div className="flex flex-col items-center justify-center h-64">
-                        <Loader text="Fragen & Antworten werden generiert..." />
+                        <Loader text={aiProcessingMessages} />
                         {error && <p className="text-red-400 mt-4">{error}</p>}
                     </div>
                 ) : (

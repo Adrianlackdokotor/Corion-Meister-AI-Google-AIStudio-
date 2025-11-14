@@ -30,6 +30,13 @@ ${materials.trim() || "Es wurden noch keine Lernmaterialien bereitgestellt. Die 
 
 const CHAT_MESSAGE_COST = 1;
 
+const thinkingMessages = [
+    "Corion überlegt...",
+    "Durchsuche die Wissensdatenbank...",
+    "Formuliere eine hilfreiche Antwort...",
+    "Prüfe die Fakten..."
+];
+
 const ChatInterface: React.FC<ChatInterfaceProps> = ({ studyMaterials, currentUser, consumeCredits }) => {
     const [messages, setMessages] = useState<ChatMessage[]>([]);
     const [userInput, setUserInput] = useState('');
@@ -168,7 +175,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ studyMaterials, currentUs
                          {isLoading && (
                             <div className="flex justify-start">
                                 <div className="max-w-xl p-3 rounded-lg bg-gray-700">
-                                    <Loader text="Corion überlegt..." />
+                                    <Loader text={thinkingMessages} />
                                 </div>
                             </div>
                         )}

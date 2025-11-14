@@ -2,6 +2,9 @@
 import React, { useState } from 'react';
 import { Icon } from './Icon';
 import { Language, User } from '../types';
+import Loader from './Loader';
+
+declare const Stripe: any; // Using Stripe.js from the script tag in index.html
 
 interface SettingsModalProps {
   isOpen: boolean;
@@ -9,17 +12,23 @@ interface SettingsModalProps {
   language: Language;
   setLanguage: (language: Language) => void;
   currentUser: User | null;
-  onAddCredits: (amount: number, description: string) => void;
+  onAddCredits: (amount: number, description: string) => void; // Kept for potential manual additions
   onOpenAchievements: () => void;
 }
 
 type SettingsTab = 'general' | 'billing';
 
+// IMPORTANT: Replace these with the actual Price IDs from your Stripe Dashboard.
 const creditPackages = [
-    { name: 'Starter Paket', credits: 10000, price: '5,00 €' },
-    { name: 'Profi Paket', credits: 50000, price: '20,00 €' },
-    { name: 'Meister Paket', credits: 150000, price: '50,00 €' },
+    { name: 'Starter Paket', credits: 10000, price: '5,00 €', priceId: 'price_1STJtFGXmxuNg2UqDGRkJY6m' },
+    { name: 'Profi Paket', credits: 50000, price: '20,00 €', priceId: 'price_1STJuZGXmxuNg2Uqs4w2Nobm' },
+    { name: 'Meister Paket', credits: 150000, price: '50,00 €', priceId: 'price_1STJvBGXmxuNg2Uqy1JTsO22' },
 ];
+
+const BACKEND_URL = 'http://localhost:4242';
+// IMPORTANT: Replace with your actual Stripe publishable key from .env or your config
+const STRIPE_PUBLISHABLE_KEY = 'pk_test_51STJceGXmxuNg2UqgoemKqJ5fUWjObnPHbdWprOcX4hZwuSjpm8JmNssYWl1E0WLJD6u5vvErGhgKb1iOu1ER9WT00F9UE5Il2';
+
 
 const SettingsModal: React.FC<SettingsModalProps> = ({
   isOpen,
@@ -31,8 +40,52 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
   onOpenAchievements
 }) => {
   const [activeTab, setActiveTab] = useState<SettingsTab>('general');
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   
   if (!isOpen) return null;
+
+  const handlePurchase = async (priceId: string) => {
+    if (!currentUser) {
+        setError("Benutzer nicht gefunden. Bitte neu anmelden.");
+        return;
+    }
+    
+    setIsLoading(true);
+    setError(null);
+    
+    try {
+        const stripe = Stripe(STRIPE_PUBLISHABLE_KEY);
+
+        const response = await fetch(`${BACKEND_URL}/api/create-checkout-session`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ priceId, userEmail: currentUser.email }),
+        });
+        
+        const session = await response.json();
+        
+        if (!response.ok) {
+            throw new Error(session.error || 'Fehler bei der Kommunikation mit dem Server.');
+        }
+
+        const result = await stripe.redirectToCheckout({
+            sessionId: session.sessionId,
+        });
+
+        if (result.error) {
+            throw new Error(result.error.message);
+        }
+    } catch (err: any) {
+        console.error('Stripe Checkout Fehler:', err);
+        setError(err.message || 'Ein unerwarteter Fehler ist aufgetreten.');
+        setIsLoading(false);
+    }
+    // No need to set isLoading to false here, as the user will be redirected.
+  };
+
 
   const GeneralSettings = () => (
     <div className="space-y-6">
@@ -57,7 +110,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
             <h4 className="font-semibold text-gray-200 mb-2">Erfolge</h4>
             <button 
                 onClick={() => {
-                    onClose(); // Close settings to show achievements
+                    onClose();
                     onOpenAchievements();
                 }}
                 className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-gray-700 text-white font-semibold rounded-lg hover:bg-gray-600 transition-colors"
@@ -78,23 +131,30 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
         
         <div>
             <h4 className="font-semibold text-gray-200 mb-2">Guthaben aufladen</h4>
-            <div className="space-y-2">
-                {creditPackages.map(pkg => (
-                    <div key={pkg.name} className="flex justify-between items-center p-3 bg-gray-700/50 rounded-lg">
-                        <div>
-                            <p className="font-semibold">{pkg.name}</p>
-                            <p className="text-sm text-yellow-400">{pkg.credits.toLocaleString('de-DE')} Hub+1</p>
+            {isLoading ? (
+                <div className="flex justify-center items-center h-24">
+                    <Loader text="Weiterleitung zu Stripe..." />
+                </div>
+            ) : (
+                <div className="space-y-2">
+                    {creditPackages.map(pkg => (
+                        <div key={pkg.name} className="flex justify-between items-center p-3 bg-gray-700/50 rounded-lg">
+                            <div>
+                                <p className="font-semibold">{pkg.name}</p>
+                                <p className="text-sm text-yellow-400">{pkg.credits.toLocaleString('de-DE')} Hub+1</p>
+                            </div>
+                            <button 
+                                onClick={() => handlePurchase(pkg.priceId)}
+                                className="px-4 py-1.5 bg-red-600 text-white font-semibold rounded-lg hover:bg-red-700 text-sm"
+                            >
+                                {pkg.price} Kaufen
+                            </button>
                         </div>
-                        <button 
-                            onClick={() => onAddCredits(pkg.credits, `Kauf: ${pkg.name}`)}
-                            className="px-4 py-1.5 bg-red-600 text-white font-semibold rounded-lg hover:bg-red-700 text-sm"
-                        >
-                            {pkg.price} Kaufen
-                        </button>
-                    </div>
-                ))}
-            </div>
-            <p className="text-xs text-gray-500 mt-2">Die Bezahlung wird sicher über Stripe abgewickelt (simuliert).</p>
+                    ))}
+                </div>
+            )}
+            {error && <p className="text-sm text-red-400 mt-2 text-center">{error}</p>}
+            <p className="text-xs text-gray-500 mt-2">Die Bezahlung wird sicher über Stripe abgewickelt.</p>
         </div>
 
         <div>
@@ -164,7 +224,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
             </div>
         </div>
         
-        <div className="p-6">
+        <div className="p-6 min-h-[300px]">
             {activeTab === 'general' ? <GeneralSettings /> : <BillingSettings />}
         </div>
         

@@ -1,3 +1,4 @@
+
 import { GoogleGenAI, Chat, GenerateContentResponse, Modality, Type, LiveSession, LiveServerMessage, CloseEvent, ErrorEvent, FunctionDeclaration } from '@google/genai';
 import { FlashcardEvaluation, MultipleChoiceQuestion, Flashcard, Language, LibraryCategory, LibraryEntry, MateMaterial, FormelFlashcard } from '../types';
 
@@ -47,6 +48,21 @@ export const generateImage = async (prompt: string, aspectRatio: string): Promis
       numberOfImages: 1,
       outputMimeType: 'image/jpeg',
       aspectRatio,
+    },
+  });
+  const base64ImageBytes: string = response.generatedImages[0].image.imageBytes;
+  return `data:image/jpeg;base64,${base64ImageBytes}`;
+};
+
+export const generateImageForAudio = async (prompt: string): Promise<string> => {
+  const ai = getAIClient();
+  const response = await ai.models.generateImages({
+    model: 'imagen-4.0-generate-001',
+    prompt: `Create a visually appealing, abstract background image inspired by the following theme: "${prompt}"`,
+    config: {
+      numberOfImages: 1,
+      outputMimeType: 'image/jpeg',
+      aspectRatio: '16:9',
     },
   });
   const base64ImageBytes: string = response.generatedImages[0].image.imageBytes;

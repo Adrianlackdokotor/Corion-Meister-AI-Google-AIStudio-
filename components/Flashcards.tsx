@@ -19,6 +19,13 @@ const shuffleArray = <T,>(array: T[]): T[] => {
 
 const EVALUATION_COST = 10;
 
+const evaluatingMessages = [
+    "Meister Corion analysiert...",
+    "Vergleiche mit der korrekten Antwort...",
+    "Formuliere konstruktives Feedback...",
+    "Aktualisiere den Lernfortschritt..."
+];
+
 interface FlashcardViewerProps {
     category: Category;
     cards: Flashcard[];
@@ -51,6 +58,7 @@ const FlashcardViewer: React.FC<FlashcardViewerProps> = ({ category, cards, onBa
     const [isEvaluating, setIsEvaluating] = useState(false);
     const [isRecording, setIsRecording] = useState(false);
     const recognitionRef = useRef<SpeechRecognition | null>(null);
+    const fileInputRef = useRef<HTMLInputElement>(null);
 
     const currentCard = cards[currentIndex];
     
@@ -134,6 +142,18 @@ const FlashcardViewer: React.FC<FlashcardViewerProps> = ({ category, cards, onBa
         }
     };
     
+    const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files && e.target.files[0] && currentCard) {
+            const file = e.target.files[0];
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                const imageUrl = reader.result as string;
+                onUpdateCardImage(currentCard.id, imageUrl);
+            };
+            reader.readAsDataURL(file);
+        }
+    };
+
     const getFeedbackStyles = () => {
         if (!aiFeedback) return { borderColor: 'border-gray-700', icon: 'chat', color: 'text-gray-400', title: '' };
         switch (aiFeedback.result) {
@@ -203,6 +223,21 @@ const FlashcardViewer: React.FC<FlashcardViewerProps> = ({ category, cards, onBa
                            <div className="flex justify-between items-center">
                                 <MasteryStars level={currentCard.masteryLevel} />
                                 <div className="flex items-center gap-2">
+                                     <input
+                                        type="file"
+                                        ref={fileInputRef}
+                                        onChange={handleImageUpload}
+                                        accept="image/*"
+                                        className="hidden"
+                                     />
+                                     <button 
+                                        onClick={() => fileInputRef.current?.click()}
+                                        className="px-4 py-1 text-sm bg-gray-600 rounded-md hover:bg-gray-500 flex items-center gap-1.5"
+                                        title="Hintergrundbild ändern"
+                                    >
+                                        <Icon name="upload" className="h-4 w-4" />
+                                        <span>Bild ändern</span>
+                                    </button>
                                      {!isAnswerVisible && (
                                         <button onClick={() => setIsAnswerVisible(true)} className="px-4 py-1 text-sm bg-gray-600 rounded-md hover:bg-gray-500">
                                             Antwort anzeigen
@@ -249,7 +284,7 @@ const FlashcardViewer: React.FC<FlashcardViewerProps> = ({ category, cards, onBa
 
                     {isEvaluating && (
                         <div className="mt-4 p-4 bg-gray-800 rounded-lg border border-gray-700 flex justify-center">
-                            <Loader text="Meister Corion analysiert..." />
+                            <Loader text={evaluatingMessages} />
                         </div>
                     )}
 
@@ -292,6 +327,7 @@ interface FlashcardsProps {
 }
 
 const Flashcards: React.FC<FlashcardsProps> = ({ 
+    audioManager,
     language, 
     studyLibrary, 
     currentUser, 
@@ -323,6 +359,44 @@ const Flashcards: React.FC<FlashcardsProps> = ({
     const [cardsForViewing, setCardsForViewing] = useState<Flashcard[] | null>(null);
     const [viewingCategory, setViewingCategory] = useState<Category | null>(null);
     const [isResetConfirmOpen, setIsResetConfirmOpen] = useState(false);
+
+    const handlungsfelder: Record<string, string[]> = useMemo(() => ({
+      'Handlungsfeld 1: Technik & Gestaltung': [
+        'VI. Lackierung und Technische Kontrolle',
+        'VII. Technische Instandsetzung und Karosserie'
+      ],
+      'Handlungsfeld 2: Auftragsabwicklung': [
+        'III. Auftragsabwicklung, Kalkulation und Recht',
+        'IV. Nachkalkulation, Kostenstellen und Preise',
+        'X. Übergabe und Service'
+      ],
+      'Handlungsfeld 3: Betriebsführung & Organisation': [
+        'I. Sicherheit, Gefahrstoffe und Organisation',
+        'II. Umwelt, Entsorgung und Arbeitsschutzrecht',
+        'V. Qualitätsmanagement und Organisation',
+        'VIII. Mitarbeiterführung und Schulung',
+        'IX. Subunternehmer und Leiharbeiter',
+        'XI. Marketing und Betriebswirtschaft',
+        'XII. Sonstiges und Akronyme'
+      ]
+    }), []);
+
+    const groupedCategories = useMemo(() => {
+        const allCategorizedTitles = Object.values(handlungsfelder).flat();
+        
+        const groups: Record<string, LibraryCategory[]> = {};
+
+        for (const [hfTitle, catTitles] of Object.entries(handlungsfelder)) {
+            groups[hfTitle] = studyLibrary.filter(c => catTitles.includes(c.title));
+        }
+        
+        const otherCats = studyLibrary.filter(c => !allCategorizedTitles.includes(c.title));
+        if (otherCats.length > 0) {
+            groups['Weitere Kategorien'] = otherCats;
+        }
+        
+        return groups;
+    }, [studyLibrary, handlungsfelder]);
 
     const executeResetProgress = () => {
         // This should now be handled by a function passed from App.tsx if we want to persist it.
@@ -356,33 +430,13 @@ const Flashcards: React.FC<FlashcardsProps> = ({
                 onBack={handleBackToSelection} 
                 onUpdateCardMastery={onUpdateCardMastery}
                 onUpdateCardImage={onUpdateCardImage}
-                audioManager={new AudioManager(0, true)} // Re-instantiate as it's not passed
+                audioManager={audioManager}
                 language={language}
                 currentUser={currentUser}
                 consumeCredits={consumeCredits}
             />
         )
     }
-
-    const groupedCategories = useMemo(() => {
-        const groups: Record<string, LibraryCategory[]> = {
-            'Handlungsfeld 1: Technik & Gestaltung': studyLibrary.filter(c => c.title.includes('(HF1)')),
-            'Handlungsfeld 2: Auftragsabwicklung': studyLibrary.filter(c => c.title.includes('(HF2)')),
-            'Handlungsfeld 3: Betriebsführung & Organisation': studyLibrary.filter(c => c.title.includes('(HF3)')),
-            'Mathematik & Kalkulation': studyLibrary.filter(c => c.title.includes('MATE')),
-        };
-        // Filter out empty groups
-        return Object.entries(groups).reduce((acc, [key, value]) => {
-            if (value.length > 0) {
-                acc[key] = value;
-            }
-            return acc;
-        }, {} as Record<string, LibraryCategory[]>);
-    }, [studyLibrary]);
-
-    const cleanTitle = (title: string) => {
-        return title.replace(/\(HF\d\)/, '').trim();
-    };
 
     const AccordionSection: React.FC<{title: string, categories: LibraryCategory[]}> = ({ title, categories }) => (
         <div className="bg-gray-800 rounded-lg">
@@ -403,7 +457,7 @@ const Flashcards: React.FC<FlashcardsProps> = ({
                         const masteredPercentage = total > 0 ? (mastered / total) * 100 : 0;
                         return(
                              <button key={category.title} onClick={() => handleSelectCategory(category)} className="p-4 bg-gray-700 rounded-lg text-left hover:bg-gray-600 transition-all">
-                                <h3 className="font-bold text-gray-200">{cleanTitle(category.title)}</h3>
+                                <h3 className="font-bold text-gray-200">{category.title.split(' - ')[1] || category.title}</h3>
                                 <p className="text-sm text-gray-400 mt-1">{total} Karten</p>
                                 <div className="w-full bg-gray-500 rounded-full h-1.5 mt-2">
                                     <div className="bg-green-500 h-1.5 rounded-full" style={{ width: `${masteredPercentage}%` }}></div>
@@ -442,9 +496,11 @@ const Flashcards: React.FC<FlashcardsProps> = ({
                     <h3 className="text-xl font-bold text-white">Alle Karten (Zufällig)</h3>
                     <p className="font-semibold text-lg text-red-200 mt-2">{cards.length} Karten insgesamt</p>
                 </button>
-                {Object.entries(groupedCategories).map(([groupTitle, cats]) => (
-                    cats.length > 0 && <AccordionSection key={groupTitle} title={groupTitle} categories={cats} />
-                ))}
+                {Object.entries(groupedCategories).map(([groupTitle, cats]) => {
+                    // FIX: Explicitly type 'cats' to resolve TypeScript error where it was inferred as 'unknown'.
+                    const categories = cats as LibraryCategory[];
+                    return categories.length > 0 && <AccordionSection key={groupTitle} title={groupTitle} categories={categories} />
+                })}
             </div>
 
             {isResetConfirmOpen && (

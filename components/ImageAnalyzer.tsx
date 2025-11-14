@@ -1,9 +1,15 @@
-
 import React, { useState } from 'react';
 import { analyzeImage } from '../services/geminiService';
 import { fileToGenerativePart } from '../utils/fileUtils';
 import Loader from './Loader';
 import { Icon } from './Icon';
+
+const imageAnalysisMessages = [
+    "Verarbeite das Bild...",
+    "Identifiziere Objekte und Szenen...",
+    "Beantworte die Frage...",
+    "Stelle die Analyse zusammen..."
+];
 
 const ImageAnalyzer: React.FC = () => {
   const [prompt, setPrompt] = useState('');
@@ -85,7 +91,7 @@ const ImageAnalyzer: React.FC = () => {
         {/* Display Area */}
         <div className="md:w-2/3 bg-gray-800 rounded-lg flex items-center justify-center p-4 overflow-auto border border-gray-700">
           {isLoading ? (
-            <Loader text="Analyzing image..." />
+            <Loader text={imageAnalysisMessages} />
           ) : analysis ? (
             <div className="w-full h-full overflow-y-auto p-2 text-gray-200 whitespace-pre-wrap">
               {analysis}

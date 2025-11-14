@@ -1,4 +1,5 @@
 
+
 export interface ChatMessage {
   role: 'user' | 'model';
   text: string;
@@ -64,6 +65,7 @@ export interface FachgespraechTopic {
   id: string;
   title: string;
   content: string;
+  backgroundImageUrl?: string;
 }
 
 export type Language = 'German' | 'Romanian' | 'English' | 'Polish';
@@ -103,6 +105,9 @@ export interface User {
   lastLoginDate: string; // ISO date string 'YYYY-MM-DD'
   dailyStreak: number;
   achievements: UserAchievement[];
+  // FIX: Add properties to track quiz and exam completions for achievements.
+  quizzesCompleted?: number;
+  examsCompleted?: number;
 }
 
 
@@ -112,6 +117,16 @@ export interface MateMaterial {
   content: string; // Markdown content
   isUserCreated?: boolean;
   notes?: string[];
+}
+
+export interface MediaLibraryItem {
+  id: string;
+  type: 'video' | 'audio';
+  title: string;
+  description: string;
+  // Data is loaded from IndexedDB on demand, not stored in state
+  data?: string; 
+  mimeType: string;
 }
 
 // Declare aistudio on the window object

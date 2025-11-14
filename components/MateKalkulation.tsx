@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { Icon } from './Icon';
 import { MateMaterial, Language, ChatMessage, User } from '../types';
@@ -10,6 +9,19 @@ import { Chat } from '@google/genai';
 const AI_MATERIAL_COST = 250;
 const AI_EXPLANATION_COST = 5;
 const AI_CHAT_COST = 1;
+
+const mateMaterialMessages = [
+    "Analysiere die Kalkulationsdaten...",
+    "Strukturiere den Inhalt...",
+    "Erstelle einen passenden Titel...",
+    "Formatiere das Material in Markdown..."
+];
+
+const explanationMessages = [
+    "Lese den Kontext...",
+    "Analysiere den markierten Begriff...",
+    "Formuliere eine einfache Erklärung..."
+];
 
 // --- MODAL: Add/Edit Manually ---
 const AddManualModal: React.FC<{
@@ -128,7 +140,7 @@ const AIProcessModal: React.FC<{
                 <h3 className="text-2xl font-bold mb-4">Materialien mit AI verarbeiten</h3>
                 <p className="text-gray-400 mb-6">Laden Sie eine Datei hoch oder fügen Sie Text ein. Die AI generiert daraus automatisch ein strukturiertes Lernmaterial.</p>
                 
-                {isGenerating ? <div className="h-64 flex justify-center items-center"><Loader text="Material wird erstellt..."/></div> : <>
+                {isGenerating ? <div className="h-64 flex justify-center items-center"><Loader text={mateMaterialMessages}/></div> : <>
                     <div className="space-y-4">
                         <input type="file" onChange={handleFileChange} disabled={isProcessingFile} accept=".pdf,.docx,image/*" className="w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-red-600 file:text-white hover:file:bg-red-700"/>
                         {isProcessingFile && <div className="w-full bg-gray-600 rounded-full h-2.5"><div className="bg-red-500 h-2.5 rounded-full" style={{ width: `${progress}%` }}></div></div>}
@@ -165,7 +177,7 @@ const AIExplanationModal: React.FC<{
             <div className="bg-gray-800 rounded-lg p-8 w-full max-w-xl shadow-xl border border-gray-700 flex flex-col">
                 <h3 className="text-2xl font-bold mb-4 flex items-center gap-2"><Icon name="chat" /> Meister Corion erklärt:</h3>
                 <div className="max-h-80 overflow-y-auto p-4 bg-gray-900 rounded-md flex-grow">
-                    {isLoading && <Loader text="Erklärung wird geladen..." />}
+                    {isLoading && <Loader text={explanationMessages} />}
                     {error && <p className="text-red-400">{error}</p>}
                     {!isLoading && !error && <p className="text-gray-300 whitespace-pre-wrap">{explanation}</p>}
                 </div>
@@ -269,6 +281,13 @@ const MateKalkulation: React.FC<MateKalkulationProps> = ({ materials, onAddMater
         setCurrentMaterial(material);
         setView('viewer');
         setHighlightedText(null);
+    };
+    
+    // FIX: Created a dedicated handler for deleting materials.
+    const handleDelete = (material: MateMaterial) => {
+        if (window.confirm(`Sind Sie sicher, dass Sie das Material "${material.title}" löschen möchten?`)) {
+            onDeleteMaterial(material.id);
+        }
     };
 
     const handleMouseUp = () => {
@@ -453,8 +472,9 @@ const MateKalkulation: React.FC<MateKalkulationProps> = ({ materials, onAddMater
                             <button onClick={() => handleSelectMaterial(material)} className="text-sm text-red-400 hover:underline">Öffnen</button>
                             {material.isUserCreated && (
                                 <button
-                                    onClick={() => { if(window.confirm("Sind Sie sicher?")) onDeleteMaterial(material.id); }}
+                                    onClick={() => handleDelete(material)}
                                     className="text-gray-500 hover:text-red-500"
+                                    title="Material löschen"
                                 >
                                     <Icon name="trash" className="h-4 w-4" />
                                 </button>

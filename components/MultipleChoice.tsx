@@ -14,6 +14,13 @@ interface MultipleChoiceProps {
 
 const QUIZ_GENERATION_COST = 100;
 
+const quizGenerationMessages = [
+    "Analysiere Lernmaterialien...",
+    "Erstelle relevante Fragen...",
+    "Generiere plausible Ablenkungsantworten...",
+    "Stelle das Quiz zusammen..."
+];
+
 const MultipleChoice: React.FC<MultipleChoiceProps> = ({ studyMaterials, language, currentUser, consumeCredits, onQuizComplete }) => {
     const [quiz, setQuiz] = useState<MultipleChoiceQuestion[] | null>(null);
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -204,7 +211,7 @@ const MultipleChoice: React.FC<MultipleChoiceProps> = ({ studyMaterials, languag
                 </div>
             ) : (
                 <div className="flex-1 flex justify-center items-center overflow-y-auto pt-4">
-                     {isLoading ? <Loader text="Quiz wird erstellt..." /> : renderQuiz()}
+                     {isLoading ? <Loader text={quizGenerationMessages} /> : renderQuiz()}
                 </div>
             )}
         </div>

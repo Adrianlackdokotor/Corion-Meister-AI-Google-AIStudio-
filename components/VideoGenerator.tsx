@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useCallback } from 'react';
 import { generateVideo } from '../services/geminiService';
 import { fileToGenerativePart } from '../utils/fileUtils';
@@ -83,20 +82,6 @@ const VideoGenerator: React.FC = () => {
     "Finalizing video render...",
     "Almost there, preparing your video..."
   ];
-  const [loadingMessage, setLoadingMessage] = useState(loadingMessages[0]);
-
-  useEffect(() => {
-    // FIX: Changed NodeJS.Timeout to number for browser compatibility.
-    let interval: number;
-    if (isLoading) {
-      let i = 0;
-      interval = window.setInterval(() => {
-        i = (i + 1) % loadingMessages.length;
-        setLoadingMessage(loadingMessages[i]);
-      }, 5000);
-    }
-    return () => clearInterval(interval);
-  }, [isLoading, loadingMessages]);
 
   if (hasApiKey === null) {
     return (
@@ -161,7 +146,7 @@ const VideoGenerator: React.FC = () => {
         {/* Display Area */}
         <div className="md:w-2/3 bg-gray-800 rounded-lg flex items-center justify-center p-4 overflow-auto border border-gray-700">
           {isLoading ? (
-            <Loader text={loadingMessage} />
+            <Loader text={loadingMessages} />
           ) : generatedVideo ? (
             <video src={generatedVideo} controls autoPlay loop className="max-h-full max-w-full rounded-md" />
           ) : (

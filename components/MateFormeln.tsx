@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { FormelFlashcard, User } from '../types';
 import { Icon } from './Icon';
@@ -70,6 +69,13 @@ const AddEditModal: React.FC<{
 
 const AI_PROCESSING_COST = 250;
 
+const formulaExtractionMessages = [
+    "Scanne Text nach Formeln...",
+    "Identifiziere Variablen und Einheiten...",
+    "Formatiere die Lernkarten...",
+    "Stelle die Ergebnisse zusammen..."
+];
+
 // --- MODAL: Process with AI ---
 const AiProcessingModal: React.FC<{
     isOpen: boolean;
@@ -140,7 +146,7 @@ const AiProcessingModal: React.FC<{
                 <h3 className="text-2xl font-bold mb-4">Formeln mit AI verarbeiten</h3>
                 <p className="text-gray-400 mb-6">Laden Sie eine Datei hoch oder fügen Sie Text ein. Die AI extrahiert daraus automatisch Formeln und erstellt Lernkarten.</p>
                 
-                {isGenerating ? <div className="h-64 flex justify-center items-center"><Loader text="Formeln werden extrahiert..."/></div> : <>
+                {isGenerating ? <div className="h-64 flex justify-center items-center"><Loader text={formulaExtractionMessages}/></div> : <>
                     <div className="space-y-4">
                         <input type="file" onChange={handleFileChange} disabled={isProcessingFile} accept=".pdf,.docx,image/*" className="w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-red-600 file:text-white hover:file:bg-red-700"/>
                         {isProcessingFile && <div className="w-full bg-gray-600 rounded-full h-2.5"><div className="bg-red-500 h-2.5 rounded-full" style={{ width: `${progress}%` }}></div></div>}

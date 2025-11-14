@@ -5,7 +5,7 @@ Dies ist der vollständige Satz an Fragen und Antworten, exakt aus Ihren Quellen
 
 ## Fragen und Antworten für die Anwendung (Deutsch)
 
-### (HF3) I. Sicherheit, Gefahrstoffe und Organisation
+### I. Sicherheit, Gefahrstoffe und Organisation
 
 | Nr. | Frage | Antwort | Quellen |
 | :--- | :--- | :--- | :--- |
@@ -31,7 +31,7 @@ Dies ist der vollständige Satz an Fragen und Antworten, exakt aus Ihren Quellen
 | 20 | Sie bekommen von Ihrem Lieferanten einen neuen Lack mit Gefahrenhinweisen (H226, H317, H336, H411). Welche **Maßnahmen** müssen Sie ergreifen? | Mitarbeiter unterweisen / Vorschriften; **Atemschutz tragen und Explosionsschutz** beachten; Für gute Belüftung sorgen; Lagerung beachten; Transportbedingungen beachten; Der neue Lack nur im **EX Schutz Bereich** verwenden; Zugelassene Behälter und Gebinde verwenden; Hautkontakt vermeiden. | |
 | 21 | Welche **Gefahren** kann **Strom** für den Menschen verursachen? Nennen Sie 4 Punkte. | **Stromstärke** (Stromschlag); **Stromdauer**; **Spannungshöhe**; Feuchtigkeit / schlechte Isolierung. | |
 
-### (HF3) II. Umwelt, Entsorgung und Arbeitsschutzrecht
+### II. Umwelt, Entsorgung und Arbeitsschutzrecht
 
 | Nr. | Frage | Antwort | Quellen |
 | :--- | :--- | :--- | :--- |
@@ -56,7 +56,7 @@ Dies ist der vollständige Satz an Fragen und Antworten, exakt aus Ihren Quellen
 | 40 | Welche Pflichten hat der Arbeitgeber auf den Bezug der **PSA**? | Überwachungspflicht; Fürsorgepflicht; Unterweisungspflicht; Schutzmaßnahmen ergreifen; Dokumentationspflicht; Musterprüfung. | |
 | 41 | Was ist beim Einsatz, der Reinigung und Lagerung von **Schutzhandschuhen** zu berücksichtigen? | **Tragedauer** beachten; Vor Wärmequellen und UV-Strahlung schützen; In gut belüfteten Räumen lagern; Nur passende Handschuhe verwenden; Keine defekten oder verschmutzten Handschuhe verwenden; Vor dem Ausziehen außen desinfizieren oder mit Wasser abwaschen; Handschuhe vor dem nächsten Gebrauch kontrollieren. | |
 
-### (HF2) III. Auftragsabwicklung, Kalkulation und Recht
+### III. Auftragsabwicklung, Kalkulation und Recht
 
 | Nr. | Frage | Antwort | Quellen |
 | :--- | :--- | :--- | :--- |
@@ -74,7 +74,7 @@ Dies ist der vollständige Satz an Fragen und Antworten, exakt aus Ihren Quellen
 | 53 | Nennen Sie **2 Gewährleistungsansprüche** die einen Kunden durch Mangelhafte ausgeführten Lackierarbeiten zustehen? | Preisnachlass; Schadenersatz; Nachbesserung; Rücktritt/Wandlung. | |
 | 54 | Nennen Sie **4 Rechtsfolgen** die durch die Sachfreie **Mangelabnahme** einer Handwerksleistung ausgelöst werden? | **Zahlungspflicht**; **Garantie**; **Verjährungsfrist** fängt an; **Umkehr der Beweislast**; Beginn der Gewährleistung. | |
 
-### (HF2) IV. Nachkalkulation, Kostenstellen und Preise
+### IV. Nachkalkulation, Kostenstellen und Preise
 
 | Nr. | Frage | Antwort | Quellen |
 | :--- | :--- | :--- | :--- |
@@ -88,7 +88,7 @@ Dies ist der vollständige Satz an Fragen und Antworten, exakt aus Ihren Quellen
 | 62 | Was ist die **Deckungsbeitragsrechnung**? | Berechnet den Betrag, ob unsere **Fixkosten gedeckt** sind. | |
 | 63 | Wann spricht man von einer **zeitwertgerechten Lackierung**? | Wenn **Kosten der Lackierung nicht den Wert des Fahrzeugs übersteigen**. | |
 
-### (HF3) V. Qualitätsmanagement und Organisation
+### V. Qualitätsmanagement und Organisation
 
 | Nr. | Frage | Antwort | Quellen |
 | :--- | :--- | :--- | :--- |
@@ -101,7 +101,7 @@ Dies ist der vollständige Satz an Fragen und Antworten, exakt aus Ihren Quellen
 | 70 | Was ist **QM**? | Ein System zur Sicherstellung und Verbesserung der **Qualität** von Produkten, Dienstleistungen und Prozessen. | |
 | 71 | Nennen Sie **Vorteile** eines **QM-Systems**. | Kundenzufriedenheit; Geringere Reklamationen; Besserer Marktpreis; Wettbewerbsvorteil; Vertrauen zum Kunden. | |
 
-### (HF1) VI. Lackierung und Technische Kontrolle
+### VI. Lackierung und Technische Kontrolle
 
 | Nr. | Frage | Antwort | Quellen |
 | :--- | :--- | :--- | :--- |
@@ -133,7 +133,7 @@ Dies ist der vollständige Satz an Fragen und Antworten, exakt aus Ihren Quellen
 | 97 | Welche **Kriterien** spielen bei der **Auswahl der Spritzpistole** eine Rolle? | Materialverbrauch; Gewicht (Ergonomie); Spritzbild; Zerstäubung; Düsen- und Wartungsaufwand. | |
 | 98 | Eine Spritzpistole ist von einem Lackhersteller freigegeben. Darf sie auch für andere Lackmaterialien eines anderen Lackherstellers verwendet werden? | Text aus dem Merkblatt! (Abhängig von den Vorgaben des Herstellers). | |
 
-### (HF1) VII. Technische Instandsetzung und Karosserie
+### VII. Technische Instandsetzung und Karosserie
 
 | Nr. | Frage | Antwort | Quellen |
 | :--- | :--- | :--- | :--- |
@@ -147,7 +147,7 @@ Dies ist der vollständige Satz an Fragen und Antworten, exakt aus Ihren Quellen
 | 106 | Worauf ist bei einer **Achsvermessung** alles zu achten? Nennen Sie 4. | Reifendruck; Gerade Stellung; Gerade Stellung des Lenkrads sicherstellen; Fehlwinkel Feder; Lage der Achsköpfe. | |
 | 107 | Welche **Eigenschaften** sollten **Kompressoren** aufweisen? | **Kolbenkompressor:** Laut; Geringe Kosten in der Anschaffung; Leistungsschwächer; Wartung intensiv; Einfache Bauweise; Zur Luftversorgung geeignet. **Schraubenkompressor:** Leiser; Wartungsärmer; Teurer in der Anschaffung; Gegen Kälte empfindlich. | |
 
-### (HF3) VIII. Mitarbeiterführung und Schulung
+### VIII. Mitarbeiterführung und Schulung
 
 | Nr. | Frage | Antwort | Quellen |
 | :--- | :--- | :--- | :--- |
@@ -157,7 +157,7 @@ Dies ist der vollständige Satz an Fragen und Antworten, exakt aus Ihren Quellen
 | 111 | Darf sich Ihr **Azubi eigenmächtig von der Berufsschule freistellen**? Wenn ja, unter welchen Voraussetzungen? | Nur bei unerwarteten oder unabwendbaren privaten Ereignissen (z. B. Hochzeit, Trauerfall); In solchen Fällen wird jedoch meist milder gehandelt, wenn die Abwesenheit begründet ist. | |
 | 112 | Wie müssen Sie Ihre Mitarbeiter anweisen, um mit **Gefahrstoffen** zu arbeiten? | Mitarbeiter unterweisen; Persönliche Schutzausrüstung (PSA) ausgeben; Kontrollen durchführen und auf Fehler hinweisen. | |
 
-### (HF3) IX. Subunternehmer und Leiharbeiter
+### IX. Subunternehmer und Leiharbeiter
 
 | Nr. | Frage | Antwort | Quellen |
 | :--- | :--- | :--- | :--- |
@@ -168,7 +168,7 @@ Dies ist der vollständige Satz an Fragen und Antworten, exakt aus Ihren Quellen
 | 117 | Wer **haftet für Schäden durch Nachunternehmer**? | Immer der **Auftraggeber**. | |
 | 118 | Darf die **Beauftragung (von Subunternehmern) ohne Genehmigung** von statten gehen? | **Nein**, nur nach Absprache mit dem Kunden. | |
 
-### (HF2) X. Übergabe und Service
+### X. Übergabe und Service
 
 | Nr. | Frage | Antwort | Quellen |
 | :--- | :--- | :--- | :--- |
@@ -178,7 +178,7 @@ Dies ist der vollständige Satz an Fragen und Antworten, exakt aus Ihren Quellen
 | 122 | Nennen Sie **2 Zusatznutzen für Privatkunden**. | Auto waschen/saugen/polieren/aufräumen; Hol- und Bringservice; Leihwagen. | |
 | 123 | Nennen Sie Ihre **Kundengruppen**. | Privatkunden; Firmenkunden; Öffentliche Kunden (Gemeinden, Stadt, öffentliche Dienste). | |
 
-### (HF3) XI. Marketing und Betriebswirtschaft
+### XI. Marketing und Betriebswirtschaft
 
 | Nr. | Frage | Antwort | Quellen |
 | :--- | :--- | :--- | :--- |
@@ -197,7 +197,7 @@ Dies ist der vollständige Satz an Fragen und Antworten, exakt aus Ihren Quellen
 | 136 | Nennen Sie die **grundlegenden Merkmale für alle Schriften**. | Schriftlinie oder Schriftgrundlinie; Oberlänge; Dichte; Verhältnis Oberlinie zum Unterlänge; Vor- und Nachbreite. | |
 | 137 | Nennen Sie die **Gesetzmäßigkeiten der Typografie**. | **Serifen:** Buchstabenverzierung; **Kursiv:** Schrägstellung der Schrift; **Spationieren:** Ausgleich des Buchstabenabstands. | |
 
-### (HF3) XII. Sonstiges und Akronyme
+### XII. Sonstiges und Akronyme
 
 | Nr. | Frage | Antwort | Quellen |
 | :--- | :--- | :--- | :--- |
@@ -217,14 +217,14 @@ Dies ist der vollständige Satz an Fragen und Antworten, exakt aus Ihren Quellen
 
 | Nr. | Frage | Antwort | Quellen |
 | :--- | :--- | :--- | :--- |
-| 149 | Cum se calculează **Werkstoffkosten** (costul materialelor consumate)? | Formulă: Verbrauch = Anfangsbestand + Zugänge - Endbestand. Exemplu: 11.500 + 127.290 - 11.200 = 127.590 €. | MATE |
-| 150 | Cum se calculează **Lohnkosten direkt verrechenbar** (costuri directe cu forța de muncă)? | Gesellenlöhne direkt (după corecții) + 50% Ausbildungsvergütung (ucenici) + Produktiver Anteil Meister/Techniker. Exemplu: 400.715 + 12.030 + 33.000 = 445.745 €. | MATE |
-| 151 | Cum se calculează **Gesamtkosten** (costurile totale)? | Werkstoffe + Direkte Löhne + Gemeinkosten + Sondereinzelkosten. Exemplu: 127.590 + 445.745 + 612.030 + 55.000 = 1.240.365 €. | MATE |
-| 152 | Cum se calculează **Betriebsergebnis** (rezultatul operațional)? | Formulă: Betriebsleistung - Gesamtkosten. Exemplu: 1.831.840 - 1.240.365 = 591.475 €. | MATE |
-| 153 | Cum se calculează **Gemeinkostenzuschlag** (suprataxa de cheltuieli generale)? | Formulă: (Gemeinkosten ÷ Direkt verrechenbare Lohnkosten) × 100. Exemplu: (612.030 ÷ 445.745) × 100 = 137.3%. | MATE |
-| 154 | Cum se calculează **Lohnkostenpreis** (prețul orar de manoperă)? | Formulă: Durchschnittslohn × Faktor (Basislohn + GK-Zuschlag + Wagnis & Gewinn). Exemplu: 17.58 € × 2.5628 = 45.05 €/Std. | MATE |
-| 155 | De ce sunt **salariile directe** (Gesellen, Azubi, Meister) singurele ore facturabile direct clienților? | Deoarece acestea sunt singurele ore care pot fi atribuite direct unui proiect specific. Acestea apar la numitor în calculul suprataxei de cheltuieli generale (GK-Zuschlag). | MATE |
-| 156 | De ce se contabilizează **materialele pe 'consum'** și nu pe achiziții? | Pentru a reflecta exact ce a fost folosit într-o perioadă, folosind formula: Stoc inițial + Intrări − Stoc final. | MATE |
+| 149 | Wie werden die **Werkstoffkosten** (Materialverbrauch) berechnet? | Formel: Verbrauch = Anfangsbestand + Zugänge - Endbestand. Beispiel: 11.500 + 127.290 - 11.200 = 127.590 €. | MATE |
+| 150 | Wie werden die **direkt verrechenbaren Lohnkosten** berechnet? | Gesellenlöhne direkt (nach Korrekturen) + 50% Ausbildungsvergütung (Azubi) + Produktiver Anteil Meister/Techniker. Beispiel: 400.715 + 12.030 + 33.000 = 445.745 €. | MATE |
+| 151 | Wie werden die **Gesamtkosten** berechnet? | Werkstoffe + Direkte Löhne + Gemeinkosten + Sondereinzelkosten. Beispiel: 127.590 + 445.745 + 612.030 + 55.000 = 1.240.365 €. | MATE |
+| 152 | Wie wird das **Betriebsergebnis** berechnet? | Formel: Betriebsleistung - Gesamtkosten. Beispiel: 1.831.840 - 1.240.365 = 591.475 €. | MATE |
+| 153 | Wie wird der **Gemeinkostenzuschlag** berechnet? | Formel: (Gemeinkosten ÷ Direkt verrechenbare Lohnkosten) × 100. Beispiel: (612.030 ÷ 445.745) × 100 = 137.3%. | MATE |
+| 154 | Wie wird der **Lohnkostenpreis** (Stundenverrechnungssatz) berechnet? | Formel: Durchschnittslohn × Faktor (Basislohn + GK-Zuschlag + Wagnis & Gewinn). Beispiel: 17.58 € × 2.5628 = 45.05 €/Std. | MATE |
+| 155 | Warum sind **direkte Löhne** (Gesellen, Azubi, Meister) die einzigen direkt an Kunden verrechenbaren Stunden? | Weil dies die einzigen Stunden sind, die direkt einem bestimmten Projekt zugeordnet werden können. Sie erscheinen im Nenner bei der Berechnung des Gemeinkostenzuschlags (GK-Zuschlag). | MATE |
+| 156 | Warum werden **Materialien nach 'Verbrauch'** und nicht nach 'Einkauf' verbucht? | Um genau abzubilden, was in einem Zeitraum verbraucht wurde, unter Verwendung der Formel: Anfangsbestand + Zugänge - Endbestand. | MATE |
 `;
 
 function parseMarkdownLibrary(markdown: string): LibraryCategory[] {

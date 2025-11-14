@@ -11,6 +11,7 @@ interface FachgespraechProps {
   studyMaterials: string;
   topics: FachgespraechTopic[];
   onUpdateTopics: React.Dispatch<React.SetStateAction<FachgespraechTopic[]>>;
+  onUpdateTopicImage: (topicId: string, imageUrl: string) => void;
   currentUser: User;
   consumeCredits: (amount: number, description: string) => boolean;
   onExamComplete: () => void;
@@ -18,10 +19,17 @@ interface FachgespraechProps {
 
 const SIMULATION_COST = 200;
 
+const examinerThinkingMessages = [
+    "Prüfer überlegt...",
+    "Bereite die nächste Frage vor...",
+    "Analysiere die letzte Antwort...",
+    "Simuliere eine realistische Prüfungssituation..."
+];
+
 const AddNewTopicModal: React.FC<{
     isOpen: boolean;
     onClose: () => void;
-    onSave: (topic: Omit<FachgespraechTopic, 'id'>) => void;
+    onSave: (topic: Omit<FachgespraechTopic, 'id' | 'backgroundImageUrl'>) => void;
 }> = ({ isOpen, onClose, onSave }) => {
     const [title, setTitle] = useState('');
     const [content, setContent] = useState('');
@@ -112,11 +120,70 @@ const AddNewTopicModal: React.FC<{
     );
 };
 
+const TopicCard: React.FC<{
+    topic: FachgespraechTopic;
+    isSelected: boolean;
+    onSelect: () => void;
+    onUpdateImage?: (topicId: string, imageUrl: string) => void;
+}> = ({ topic, isSelected, onSelect, onUpdateImage }) => {
+    const fileInputRef = useRef<HTMLInputElement>(null);
 
-const Fachgespraech: React.FC<FachgespraechProps> = ({ studyMaterials, topics, onUpdateTopics, currentUser, consumeCredits, onExamComplete }) => {
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files && e.target.files[0] && onUpdateImage) {
+            const file = e.target.files[0];
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                const imageUrl = reader.result as string;
+                onUpdateImage(topic.id, imageUrl);
+            };
+            reader.readAsDataURL(file);
+        }
+    };
+
+    const defaultBg = `https://source.unsplash.com/random/800x600?texture,abstract,${topic.title.split(' ')[0]}`;
+
+    return (
+        <div
+            onClick={onSelect}
+            className={`group relative h-40 rounded-lg shadow-lg cursor-pointer transition-all duration-300 transform hover:scale-105 bg-cover bg-center ${isSelected ? 'ring-4 ring-red-500' : ''}`}
+            style={{ backgroundImage: `url(${topic.backgroundImageUrl || defaultBg})` }}
+        >
+            <div className="absolute inset-0 bg-black bg-opacity-50 rounded-lg flex items-center justify-center p-4">
+                <h3 className="text-xl font-bold text-white text-center">{topic.title}</h3>
+            </div>
+             {onUpdateImage && (
+                 <>
+                    <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-60 transition-all duration-300 rounded-lg flex items-center justify-center">
+                        <button
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                fileInputRef.current?.click();
+                            }}
+                            className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 px-4 py-2 bg-white/80 text-black font-semibold rounded-lg hover:bg-white flex items-center gap-2"
+                            title="Hintergrundbild ändern"
+                        >
+                            <Icon name="image" className="h-5 w-5" />
+                            Hintergrund ändern
+                        </button>
+                    </div>
+                    <input
+                        type="file"
+                        ref={fileInputRef}
+                        onChange={handleFileChange}
+                        accept="image/*"
+                        className="hidden"
+                    />
+                </>
+            )}
+        </div>
+    );
+};
+
+
+const Fachgespraech: React.FC<FachgespraechProps> = ({ studyMaterials, topics, onUpdateTopics, onUpdateTopicImage, currentUser, consumeCredits, onExamComplete }) => {
     const [mode, setMode] = useState<'practice' | 'exam'>('practice');
     const [conversationState, setConversationState] = useState<'setup' | 'running' | 'finished'>('setup');
-    const [selectedTopicId, setSelectedTopicId] = useState<string>('general');
+    const [selectedTopicId, setSelectedTopicId] = useState<string | null>(null);
     const [isTopicModalOpen, setIsTopicModalOpen] = useState(false);
     
     const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -180,6 +247,11 @@ ${examTopic}
     }, [mode, studyMaterials, topics, selectedTopicId]);
 
     const handleStartConversation = async () => {
+        if (!selectedTopicId) {
+            alert("Bitte wählen Sie zuerst ein Thema aus.");
+            return;
+        }
+
         const selectedTopic = topics.find(t => t.id === selectedTopicId);
         const topicTitle = selectedTopic ? selectedTopic.title : 'Allgemeines Wissen';
 
@@ -316,67 +388,78 @@ ${examTopic}
         } catch (err) { console.error(err); setIsSpeaking(false); }
     };
 
-    const handleSaveNewTopic = (topic: Omit<FachgespraechTopic, 'id'>) => {
-        const newTopic = { ...topic, id: `topic-${Date.now()}` };
+    const handleSaveNewTopic = (topic: Omit<FachgespraechTopic, 'id' | 'backgroundImageUrl'>) => {
+        const newTopic: FachgespraechTopic = { ...topic, id: `topic-${Date.now()}` };
         onUpdateTopics(prev => [...prev, newTopic]);
         setSelectedTopicId(newTopic.id);
     };
     
-    const currentTopicContent = selectedTopicId === 'general' ? studyMaterials : topics.find(t => t.id === selectedTopicId)?.content || '';
     const hasCredits = currentUser.credits >= SIMULATION_COST;
 
     const renderSetup = () => (
-        <div className="flex-1 flex flex-col justify-center items-center p-6">
-            <div className="w-full max-w-3xl text-center">
+        <div className="flex-1 flex flex-col p-6">
+            <div className="text-center mb-8">
                 <Icon name="exam" className="h-16 w-16 mx-auto mb-4 text-red-500"/>
-                <h2 className="text-3xl font-bold mb-2">Simulation: Fachgespräch</h2>
-                <p className="text-gray-400 mb-6">Bereiten Sie sich auf Ihre mündliche Prüfung vor.</p>
-                <div className="bg-gray-800 p-6 rounded-lg shadow-lg text-left">
-                     <div className="mb-6">
-                        <h3 className="text-lg font-semibold text-gray-200 mb-2">1. Prüfungsthema wählen</h3>
-                         <div className="flex gap-2">
-                             <select
-                                value={selectedTopicId}
-                                onChange={(e) => setSelectedTopicId(e.target.value)}
-                                className="flex-grow p-2 bg-gray-700 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
-                            >
-                                <option value="general">Allgemeines Wissen (Lernbibliothek)</option>
-                                {topics.map(topic => (
-                                    <option key={topic.id} value={topic.id}>{topic.title}</option>
-                                ))}
-                            </select>
-                            <button onClick={() => setIsTopicModalOpen(true)} className="px-4 py-2 bg-red-600 text-white font-semibold rounded-lg hover:bg-red-700 flex items-center gap-2">
-                                <Icon name="add" className="h-5 w-5" />
-                                <span>Neues Thema</span>
-                            </button>
-                         </div>
-                        <div className="w-full h-32 mt-3 p-3 bg-gray-900 border border-gray-600 rounded-md overflow-y-auto">
-                            <p className="text-gray-300 whitespace-pre-wrap text-sm">{currentTopicContent || "Wählen Sie ein Thema, um den Inhalt anzuzeigen."}</p>
-                        </div>
-                    </div>
-                    <div className="mb-6">
-                        <h3 className="block text-lg font-semibold text-gray-200 mb-2">2. Wählen Sie einen Modus</h3>
-                        <div className="flex gap-4">
-                             <button onClick={() => setMode('practice')} className={`flex-1 p-4 rounded-md border-2 text-center ${mode === 'practice' ? 'bg-red-900/50 border-red-500' : 'bg-gray-700 border-gray-700 hover:border-gray-500'}`}>
-                                <h4 className="font-bold">Übungsmodus</h4>
-                                <p className="text-sm text-gray-400">Erhalten Sie Hinweise und korrigierendes Feedback.</p>
-                            </button>
-                             <button onClick={() => setMode('exam')} className={`flex-1 p-4 rounded-md border-2 text-center ${mode === 'exam' ? 'bg-red-900/50 border-red-500' : 'bg-gray-700 border-gray-700 hover:border-gray-500'}`}>
-                                 <h4 className="font-bold">Prüfungsmodus</h4>
-                                <p className="text-sm text-gray-400">Echte Prüfungssimulation mit Bewertung am Ende.</p>
-                             </button>
-                        </div>
-                    </div>
+                <h2 className="text-3xl font-bold">Simulation: Fachgespräch</h2>
+                <p className="text-gray-400">Bereiten Sie sich auf Ihre mündliche Prüfung vor. Wählen Sie zuerst ein Thema aus.</p>
+            </div>
+            
+            <div className="flex-grow overflow-y-auto pr-2">
+                <h3 className="text-lg font-semibold text-gray-200 mb-4">1. Prüfungsthema wählen</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                    {/* General Knowledge Card */}
+                    <TopicCard
+                        topic={{ id: 'general', title: 'Allgemeines Wissen', content: studyMaterials, backgroundImageUrl: 'https://source.unsplash.com/random/800x600?library,books' }}
+                        isSelected={selectedTopicId === 'general'}
+                        onSelect={() => setSelectedTopicId('general')}
+                    />
+                    
+                    {/* User created topic cards */}
+                    {topics.map(topic => (
+                        <TopicCard
+                            key={topic.id}
+                            topic={topic}
+                            isSelected={selectedTopicId === topic.id}
+                            onSelect={() => setSelectedTopicId(topic.id)}
+                            onUpdateImage={onUpdateTopicImage}
+                        />
+                    ))}
+
+                    {/* Add new topic card */}
                     <button 
-                        onClick={handleStartConversation} 
-                        disabled={!currentTopicContent.trim() || !hasCredits} 
-                        className="w-full py-3 px-4 bg-red-600 text-white font-semibold rounded-lg hover:bg-red-700 disabled:bg-gray-500 transition-colors text-lg"
+                        onClick={() => setIsTopicModalOpen(true)}
+                        className="h-40 rounded-lg border-2 border-dashed border-gray-600 flex flex-col items-center justify-center text-gray-400 hover:bg-gray-800 hover:border-red-500 transition-colors"
                     >
-                        {`Simulation starten (-${SIMULATION_COST} Hub+1)`}
+                        <Icon name="add" className="h-8 w-8 mb-2" />
+                        <span>Neues Thema</span>
                     </button>
-                    {!hasCredits && <p className="text-yellow-400 mt-4 text-center">Sie haben kein Guthaben mehr, um eine Simulation zu starten.</p>}
                 </div>
             </div>
+
+            <div className="mt-8 flex-shrink-0">
+                 <div className="mb-6 bg-gray-800 p-4 rounded-lg shadow-lg text-left">
+                    <h3 className="block text-lg font-semibold text-gray-200 mb-2">2. Wählen Sie einen Modus</h3>
+                    <div className="flex gap-4">
+                         <button onClick={() => setMode('practice')} className={`flex-1 p-4 rounded-md border-2 text-center ${mode === 'practice' ? 'bg-red-900/50 border-red-500' : 'bg-gray-700 border-gray-700 hover:border-gray-500'}`}>
+                            <h4 className="font-bold">Übungsmodus</h4>
+                            <p className="text-sm text-gray-400">Erhalten Sie Hinweise und korrigierendes Feedback.</p>
+                        </button>
+                         <button onClick={() => setMode('exam')} className={`flex-1 p-4 rounded-md border-2 text-center ${mode === 'exam' ? 'bg-red-900/50 border-red-500' : 'bg-gray-700 border-gray-700 hover:border-gray-500'}`}>
+                             <h4 className="font-bold">Prüfungsmodus</h4>
+                            <p className="text-sm text-gray-400">Echte Prüfungssimulation mit Bewertung am Ende.</p>
+                         </button>
+                    </div>
+                </div>
+                <button 
+                    onClick={handleStartConversation} 
+                    disabled={!selectedTopicId || !hasCredits} 
+                    className="w-full py-3 px-4 bg-red-600 text-white font-semibold rounded-lg hover:bg-red-700 disabled:bg-gray-500 transition-colors text-lg"
+                >
+                    {`Simulation starten (-${SIMULATION_COST} Hub+1)`}
+                </button>
+                {!hasCredits && <p className="text-yellow-400 mt-4 text-center">Sie haben kein Guthaben mehr, um eine Simulation zu starten.</p>}
+            </div>
+
             <AddNewTopicModal isOpen={isTopicModalOpen} onClose={() => setIsTopicModalOpen(false)} onSave={handleSaveNewTopic} />
         </div>
     );
@@ -410,7 +493,7 @@ ${examTopic}
                      {isLoading && (
                         <div className="flex justify-start">
                             <div className="max-w-xl p-3 rounded-lg bg-gray-700">
-                                <Loader text="Prüfer überlegt..." />
+                                <Loader text={examinerThinkingMessages} />
                             </div>
                         </div>
                     )}

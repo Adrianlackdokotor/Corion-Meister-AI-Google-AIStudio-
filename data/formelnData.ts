@@ -100,5 +100,10 @@ export const initialFormelnData: FormelFlashcard[] = [
     id: 'formel-020',
     front: 'Wie berechnet man den Angebotspreis?',
     back: 'Angebotspreis = Selbstkosten + Gewinn'
+  },
+  {
+    id: 'formel-021',
+    front: 'Lohnkosten (direkt verrechenbar)',
+    back: 'Formel: Gesellenlöhne (produktiv) + 50% Azubi-Vergütung + Meister/Techniker (produktiv)\n\nRechenbeispiel: 400.715 + 12.030 + 33.000 = 445.745 €'
   }
 ];

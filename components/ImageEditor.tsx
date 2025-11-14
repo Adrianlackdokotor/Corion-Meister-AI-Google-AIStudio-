@@ -1,9 +1,15 @@
-
 import React, { useState } from 'react';
 import { editImage } from '../services/geminiService';
 import { fileToGenerativePart } from '../utils/fileUtils';
 import Loader from './Loader';
 import { Icon } from './Icon';
+
+const imageEditMessages = [
+    "Analysiere das Originalbild...",
+    "Verstehe die Bearbeitungsanweisung...",
+    "Wende die Änderungen an...",
+    "Rendere das Ergebnis..."
+];
 
 const ImageEditor: React.FC = () => {
   const [prompt, setPrompt] = useState('');
@@ -96,7 +102,7 @@ const ImageEditor: React.FC = () => {
              <h3 className="text-lg font-semibold mb-2">Edited</h3>
              <div className="flex-grow w-full flex items-center justify-center">
                 {isLoading ? (
-                    <Loader text="Applying edit..." />
+                    <Loader text={imageEditMessages} />
                 ) : editedImage ? (
                     <img src={editedImage} alt="Edited" className="max-h-full max-w-full object-contain rounded-md" />
                 ) : (

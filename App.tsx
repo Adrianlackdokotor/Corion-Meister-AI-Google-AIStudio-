@@ -1,4 +1,5 @@
 
+
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import ChatInterface from './components/ChatInterface';
 import Flashcards from './components/Flashcards';
@@ -9,7 +10,7 @@ import StudyMaterials from './components/StudyMaterials';
 import SettingsModal from './components/SettingsModal';
 import StartupSummaryModal from './components/StartupSummaryModal';
 import { Icon } from './components/Icon';
-import { LibraryCategory, LibraryEntry, FachgespraechTopic, Language, User, MateMaterial, FormelFlashcard, Transaction, AchievementId, UserAchievement, Achievement } from './types';
+import { LibraryCategory, LibraryEntry, FachgespraechTopic, Language, User, MateMaterial, FormelFlashcard, Transaction, AchievementId, UserAchievement, Achievement, MediaLibraryItem } from './types';
 import { parsedLibraryData } from './data/libraryData';
 import { initialMateData } from './data/mateData';
 import { initialFormelnData } from './data/formelnData';
@@ -22,10 +23,12 @@ import DailyBonusModal from './components/DailyBonusModal';
 import { achievementsData } from './data/achievementsData';
 import AchievementNotification from './components/AchievementNotification';
 import AchievementsModal from './components/AchievementsModal';
+import MediaLibrary from './components/MediaLibrary';
+import { initDB, saveMedia, deleteMedia, getMediaMetadata, saveMediaMetadata } from './utils/db';
 
-type Feature = 'dashboard' | 'chat' | 'flashcards' | 'multipleChoice' | 'fachgespraech' | 'studyMaterials' | 'mate-formeln' | 'mate-kalkulation';
+type Feature = 'dashboard' | 'chat' | 'flashcards' | 'multipleChoice' | 'fachgespraech' | 'studyMaterials' | 'mate-formeln' | 'mate-kalkulation' | 'media-library';
 
-const logoBase64 = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAABDgAAAG+CAYAAABVVl3fAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhcwAADsMAAA7DAcdvqGAAAP+lSURBVHhe7J0FnFRF1sf7l5CAJCRkIYSQhAwhhEAEBEFFVFDEgoCiIBZFRERBQRQVUREEFEFAECggISQhJJCQhExI+v/3zN7d7OzuzO7s7EhyPvd5Pp+cnZmdnZ3Z2Zmd7713Zmd2d0IIoYqjiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqg-n-";
+const logoBase64 = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAABDgAAAG+CAYAAABVVl3fAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhcwAADsMAAA7DAcdvqGAAAP+lSURBVHhe7J0FnFRF1sf7l5CAJCRkIYSQhAwhhEAEBEFFVFDEgoCiIBZFRERBQRQVUREEFEFAECggISQhJJCQhExI+v/3zN7d7OzuzO7s7EhyPvd5Pp+cnZmdnZ3Z2Zmd7713Zmd2d0IIoYqjiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqgiiqg-n-";
 
 const App: React.FC = () => {
   const [currentUser, setCurrentUser] = useState<User | null>(() => {
@@ -40,6 +43,9 @@ const App: React.FC = () => {
             lastLoginDate: '',
             dailyStreak: 0,
             achievements: [],
+            // FIX: Initialize new gamification fields for existing users.
+            quizzesCompleted: 0,
+            examsCompleted: 0,
             ...parsed,
           };
         }
@@ -102,6 +108,19 @@ const App: React.FC = () => {
           console.error("Could not parse flashcard progress from localStorage", error);
           return {};
       }
+  });
+
+  const [mediaLibraryItems, setMediaLibraryItems] = useState<MediaLibraryItem[]>([]);
+  const [dbInitialized, setDbInitialized] = useState(false);
+
+  const [mediaBackgrounds, setMediaBackgrounds] = useState<{ [key: string]: string }>(() => {
+    try {
+      const saved = localStorage.getItem('mediaBackgrounds');
+      return saved ? JSON.parse(saved) : {};
+    } catch (error) {
+      console.error("Could not parse media backgrounds from localStorage", error);
+      return {};
+    }
   });
 
   const studyLibrary = useMemo(() => {
@@ -183,12 +202,74 @@ const App: React.FC = () => {
     }
   }, [currentUser]);
 
+  useEffect(() => {
+    const initialize = async () => {
+        await initDB();
+        
+        let loadedItems: MediaLibraryItem[] = [];
+        const savedInLocalStorage = localStorage.getItem('mediaLibraryItems');
+
+        if (savedInLocalStorage) {
+            console.log("Found media metadata in localStorage, migrating to IndexedDB...");
+            try {
+                const parsed = JSON.parse(savedInLocalStorage);
+                if (Array.isArray(parsed)) {
+                    loadedItems = parsed;
+                    await saveMediaMetadata(loadedItems);
+                    localStorage.removeItem('mediaLibraryItems');
+                    console.log("Metadata migration successful.");
+                }
+            } catch (error) {
+                console.error("Could not migrate media metadata from localStorage, falling back to DB.", error);
+                loadedItems = await getMediaMetadata();
+            }
+        } else {
+             loadedItems = await getMediaMetadata();
+        }
+
+        const blobMigrationNeeded = loadedItems.some(item => !!item.data);
+        if (blobMigrationNeeded) {
+            console.log("Performing one-time migration of media blobs from base64 to IndexedDB blobs...");
+            const migrationPromises = loadedItems.map(async (item) => {
+                if (item.data) {
+                    try {
+                        const fetchRes = await fetch(`data:${item.mimeType};base64,${item.data}`);
+                        const blob = await fetchRes.blob();
+                        await saveMedia(item.id, blob);
+                    } catch (e) {
+                        console.error(`Failed to migrate item blob ${item.id}`, e);
+                    }
+                }
+            });
+            await Promise.all(migrationPromises);
+            
+            const migratedItems = loadedItems.map(({ data, ...rest }) => rest);
+            setMediaLibraryItems(migratedItems);
+            await saveMediaMetadata(migratedItems);
+            console.log("Blob migration complete.");
+        } else {
+             setMediaLibraryItems(loadedItems);
+        }
+
+        setDbInitialized(true);
+    };
+    initialize().catch(err => console.error("Failed to initialize DB and migrate data", err));
+  }, []);
+
   useEffect(() => { localStorage.setItem('userStudyLibrary', JSON.stringify(userLibrary)); }, [userLibrary]);
   useEffect(() => { localStorage.setItem('fachgespraechTopics', JSON.stringify(fachgespraechTopics)); }, [fachgespraechTopics]);
   useEffect(() => { localStorage.setItem('app_language', language); }, [language]);
   useEffect(() => { localStorage.setItem('mateMaterials', JSON.stringify(mateMaterials)); }, [mateMaterials]);
   useEffect(() => { localStorage.setItem('formelFlashcards', JSON.stringify(formelFlashcards)); }, [formelFlashcards]);
   useEffect(() => { localStorage.setItem('flashcard_progress', JSON.stringify(cardProgress)); }, [cardProgress]);
+  
+  useEffect(() => {
+    if (dbInitialized) {
+      saveMediaMetadata(mediaLibraryItems).catch(err => console.error("Failed to save media metadata", err));
+    }
+  }, [mediaLibraryItems, dbInitialized]);
+
+  useEffect(() => { localStorage.setItem('mediaBackgrounds', JSON.stringify(mediaBackgrounds)); }, [mediaBackgrounds]);
 
 
   const studyMaterials = useMemo(() => {
@@ -275,6 +356,9 @@ const App: React.FC = () => {
       lastLoginDate: '',
       dailyStreak: 0,
       achievements: [],
+      // FIX: Initialize new gamification fields for new users.
+      quizzesCompleted: 0,
+      examsCompleted: 0,
   });
 
   const handleLogout = () => {
@@ -300,21 +384,43 @@ const App: React.FC = () => {
       }
   }, [currentUser]);
 
+  // FIX: Added handlers for quiz and exam completion to track progress.
+  const handleQuizComplete = useCallback(() => {
+    setCurrentUser(prevUser => {
+        if (!prevUser) return null;
+        const newCount = (prevUser.quizzesCompleted || 0) + 1;
+        return { ...prevUser, quizzesCompleted: newCount };
+    });
+  }, []);
+
+  const handleExamComplete = useCallback(() => {
+      setCurrentUser(prevUser => {
+          if (!prevUser) return null;
+          const newCount = (prevUser.examsCompleted || 0) + 1;
+          return { ...prevUser, examsCompleted: newCount };
+      });
+  }, []);
+
+
   // Achievement checking logic
   useEffect(() => {
     if (!currentUser) return;
 
     const stats = {
-        masteredCards: Object.values(cardProgress).filter(p => p.masteryLevel === 5).length,
+        // FIX: Added explicit type to the filter parameter to resolve the TypeScript error.
+        masteredCards: Object.values(cardProgress).filter((p: { masteryLevel: number }) => p.masteryLevel === 5).length,
         userContentAdded: userLibrary.reduce((sum, cat) => sum + cat.entries.length, 0),
         streak: currentUser.dailyStreak,
+        // FIX: Added quiz and exam completion stats to enable achievement unlocking.
+        quizzesCompleted: currentUser.quizzesCompleted || 0,
+        examsCompleted: currentUser.examsCompleted || 0,
     };
     
     achievementsData.forEach(achievement => {
         if (!currentUser.achievements.some(a => a.achievementId === achievement.id)) {
             const criteria = achievement.criteria;
-            // @ts-ignore
-            if (stats[criteria.type] >= criteria.value) {
+            // FIX: Removed @ts-ignore by ensuring all criteria types are present in the `stats` object.
+            if (stats[criteria.type as keyof typeof stats] >= criteria.value) {
                 unlockAchievement(achievement.id);
             }
         }
@@ -351,25 +457,6 @@ const App: React.FC = () => {
         }
         const newId = `user-${Date.now()}`;
         category.entries.push({ ...newEntry, id: newId });
-        return newLibrary;
-    });
-  };
-
-  const handleBulkAddEntries = (entries: { question: string; answer: string; categoryTitle: string }[]) => {
-    setUserLibrary(prevLibrary => {
-        const newLibrary = JSON.parse(JSON.stringify(prevLibrary)); // Deep copy
-        entries.forEach(newEntryData => {
-            let category = newLibrary.find((cat: LibraryCategory) => cat.title === newEntryData.categoryTitle);
-            if (!category) {
-                category = { title: newEntryData.categoryTitle, entries: [], isUserCreated: true };
-                newLibrary.push(category);
-            }
-            const newId = `user-${Date.now()}-${Math.random()}`;
-            // Avoid adding duplicates just in case
-            if (!category.entries.some((e: LibraryEntry) => e.question === newEntryData.question && e.answer === newEntryData.answer)) {
-                 category.entries.push({ question: newEntryData.question, answer: newEntryData.answer, id: newId });
-            }
-        });
         return newLibrary;
     });
   };
@@ -423,6 +510,62 @@ const App: React.FC = () => {
       setFormelFlashcards(prev => [...prev, ...cardsToAdd]);
   };
 
+  const handleUpdateFachgespraechTopicImage = (topicId: string, imageUrl: string) => {
+    setFachgespraechTopics(prevTopics =>
+      prevTopics.map(topic =>
+        topic.id === topicId
+          ? { ...topic, backgroundImageUrl: imageUrl }
+          : topic
+      )
+    );
+  };
+
+  const handleAddMediaItems = (newItems: { file: File, title: string, description: string }[]) => {
+    const processAndSave = async () => {
+        const newMetadataArray: MediaLibraryItem[] = [];
+        for (const item of newItems) {
+            const newItemId = `media-${Date.now()}-${Math.random()}`;
+            try {
+                await saveMedia(newItemId, item.file);
+                newMetadataArray.push({
+                    id: newItemId,
+                    title: item.title,
+                    description: item.description,
+                    type: item.file.type.startsWith('video') ? 'video' : 'audio',
+                    mimeType: item.file.type,
+                });
+            } catch (err) {
+                console.error(`Failed to save file ${item.file.name} to DB`, err);
+                // Optionally remove already saved items for this batch to keep it transactional
+                throw new Error("Error saving files.");
+            }
+        }
+        return newMetadataArray;
+    };
+
+    processAndSave()
+        .then(newMetadata => {
+            setMediaLibraryItems(prev => [...prev, ...newMetadata]);
+        })
+        .catch(err => {
+            alert("Ein Fehler ist beim Speichern der Mediendateien aufgetreten. Bitte versuchen Sie es erneut.");
+        });
+  };
+
+  const handleDeleteMediaItem = async (itemId: string) => {
+      try {
+        await deleteMedia(itemId);
+        setMediaLibraryItems(prev => prev.filter(item => item.id !== itemId));
+      } catch (err) {
+        console.error(`Failed to delete media item ${itemId}`, err);
+        alert('Fehler beim Löschen der Mediendatei.');
+      }
+  };
+
+  const handleUpdateMediaBackground = (itemId: string, imageUrl: string) => {
+    setMediaBackgrounds(prev => ({ ...prev, [itemId]: imageUrl }));
+  };
+
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
@@ -474,16 +617,25 @@ const App: React.FC = () => {
                     onUpdateCardImage={(cardId, imageUrl) => setCardProgress(prev => ({...prev, [cardId]: {...prev[cardId], backgroundImageUrl: imageUrl}}))}
                 />;
       case 'multipleChoice':
-        return <MultipleChoice {...commonProps} studyMaterials={studyMaterials} onQuizComplete={() => unlockAchievement('QUIZ_1')} />;
+        // FIX: Pass the new centralized handler to the component.
+        return <MultipleChoice {...commonProps} studyMaterials={studyMaterials} onQuizComplete={handleQuizComplete} />;
       case 'fachgespraech':
-        return <Fachgespraech {...commonProps} studyMaterials={studyMaterials} topics={fachgespraechTopics} onUpdateTopics={setFachgespraechTopics} onExamComplete={() => unlockAchievement('EXAM_1')} />;
+        // FIX: Pass the new centralized handler to the component.
+        return <Fachgespraech 
+                  {...commonProps} 
+                  studyMaterials={studyMaterials} 
+                  topics={fachgespraechTopics} 
+                  onUpdateTopics={setFachgespraechTopics} 
+                  onExamComplete={handleExamComplete} 
+                  onUpdateTopicImage={handleUpdateFachgespraechTopicImage}
+               />;
       case 'studyMaterials':
         return <StudyMaterials 
                     library={studyLibrary}
                     onAddEntry={handleAddLibraryEntry}
                     onUpdateEntry={() => {}} // Not implemented from this view
                     onDeleteEntry={() => {}} // Not implemented from this view
-                    onBulkAdd={handleBulkAddEntries}
+                    onBulkAdd={() => {}} // Not implemented from this view
                     onDeleteCategory={handleDeleteCategory}
                     consumeCredits={consumeCredits}
                     currentUser={currentUser}
@@ -507,6 +659,15 @@ const App: React.FC = () => {
                     onAddNote={handleAddNoteToMaterial}
                     {...commonProps}
                 />;
+      case 'media-library':
+        return <MediaLibrary 
+                  items={mediaLibraryItems}
+                  onAddItems={handleAddMediaItems}
+                  onDeleteItem={handleDeleteMediaItem}
+                  mediaBackgrounds={mediaBackgrounds}
+                  onUpdateMediaBackground={handleUpdateMediaBackground}
+                  consumeCredits={consumeCredits}
+               />;
       default:
         return <Dashboard 
                   user={currentUser} 
@@ -554,6 +715,7 @@ const App: React.FC = () => {
         <NavButton feature="multipleChoice" label="Multiple Choice Fragen" iconName="list" />
         <NavButton feature="fachgespraech" label="Praktische Prüfung" iconName="exam" />
         <NavButton feature="studyMaterials" label="Lernbibliothek" iconName="book" />
+        <NavButton feature="media-library" label="Video & Audio Bibliothek" iconName="video" />
         <div>
             <button
                 onClick={() => setIsMateMenuOpen(!isMateMenuOpen)}
